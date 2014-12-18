@@ -73,35 +73,30 @@ bool gi_524 = TRUE;
 //"---------------- Indicators";
 int currentPeriod = PERIOD_M1;
 int channel1_p2 = 1;
-int gi_544 = 10;
-double gd_548 = 2.0;
+int channel1_period = 10;
+double channel1_dev = 2.0;
 int channel2_p1 = 1;
 int channel2_p2 = 1;
-int gi_564 = 30;
-double gd_568 = 2.0;
+int channel2_period = 30;
+double channel2_dev = 2.0;
 int channel3_p1 = 1;
 int channel3_p2 = 5;
-int gi_584 = 30;
-double gd_588 = 2.0;
+int channel3_period = 30;
+double channel3_dev = 2.0;
 int channel4_p1 = 5;
 int channel4_p2 = 5;
-int gi_604 = 10;
-double gd_608 = 2.0;
+int channel4_period = 10;
+double channel4_dev = 2.0;
 int channel5_p1 = 5;
 int channel5_p2 = 5;
-int gi_624 = 30;
-double gd_628 = 2.0;
-int gi_636 = 1;
-int gi_640 = 5;
-double gd_644 = 2.0;
-string gs_652;
-double gda_660[2];
-double gda_664[2];
-int gia_668[2];
-double gd_672 = 1.0;
-double gd_680;
-bool gi_688;
-double gd_692;
+int channel5_period = 30;
+double channel5_dev = 2.0;
+int smartExit_period = 5;
+double smartExit_dev = 2.0;
+double bid_prices[2];
+double ask_prices[2];
+int tickCounts[2];
+double pointValue = 1.0;
 bool gi_700 = FALSE;
 bool gi_704 = FALSE;
 double gd_708 = 1.0;
@@ -235,7 +230,7 @@ int gi_1504;
 bool gi_1508;
 bool gi_1512 = FALSE;
 
-int EURUSD_IMPORT(int ai_0, int ai_4, int ai_8, int ai_12, double ad_16, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, double ad_96, double ad_104, double ad_112, double ad_120, double ad_128, int ai_136, double ad_140, double ad_148, double ad_156, double ad_164, double ad_172, double ad_180, double ad_188, double ad_196, double ad_204, double &ada_212[], double &ada_216[]) {
+int EURUSD_IMPORT(int ai_12, double ad_16, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, double ad_96, double ad_104, double ad_112, double ad_120, double ad_128, int ai_136, double ad_140, double ad_148, double ad_156, double ad_164, double ad_172, double ad_180, double ad_188, double ad_196, double ad_204, double &ada_212[], double &ada_216[]) {
    int li_220;
    int li_224;
    int li_228;
@@ -653,7 +648,7 @@ int init() {
                   Comment("ERROR -- Invalid Risk Value.");
                   Print("ERROR -- Invalid Risk Value.");
                } else {
-                  tradingPossible == TRUE;
+                  tradingPossible = TRUE;
                }
             }
          }
@@ -686,50 +681,50 @@ int start() {
          started = TRUE;
          f0_1(-1);
       }
-      f0_25(gda_660, gda_664, gia_668, gd_672);
+      f0_25(bid_prices, ask_prices, tickCounts);
       debugMessage = "";
       f0_3();
       if (SupportNFA) {
          if (searchChannel_1) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 1:\n";
-            f0_4(currentPeriod, channel1_p2, 0, 1, 2, searchEntryChannels >= 8, gd_252, gd_260, gd_268, gd_276, gd_284, gd_924, gd_940, gd_932, gd_948, gd_956, gd_468, gi_544, gd_548, gda_844);
+            f0_4(currentPeriod, channel1_p2, 0, 1, 2, searchEntryChannels >= 8, gd_252, gd_260, gd_268, gd_276, gd_284, gd_924, gd_940, gd_932, gd_948, gd_956, gd_468, channel1_period, channel1_dev, gda_844);
          }
          if (searchChannel_2) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 2:\n";
-            f0_4(channel2_p1, channel2_p2, 3, 4, 5, searchEntryChannels >= 8, gd_292, gd_300, gd_308, gd_316, gd_324, gd_964, gd_980, gd_972, gd_988, gd_996, gd_476, gi_564, gd_568, gda_848);
+            f0_4(channel2_p1, channel2_p2, 3, 4, 5, searchEntryChannels >= 8, gd_292, gd_300, gd_308, gd_316, gd_324, gd_964, gd_980, gd_972, gd_988, gd_996, gd_476, channel2_period, channel2_dev, gda_848);
          }
          if (searchChannel_3) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 3:\n";
-            f0_4(channel3_p1, channel3_p2, 6, 7, 8, searchEntryChannels >= 8, gd_332, gd_340, gd_348, gd_356, gd_364, gd_1004, gd_1020, gd_1012, gd_1028, gd_1036, gd_484, gi_584, gd_588, gda_852);
+            f0_4(channel3_p1, channel3_p2, 6, 7, 8, searchEntryChannels >= 8, gd_332, gd_340, gd_348, gd_356, gd_364, gd_1004, gd_1020, gd_1012, gd_1028, gd_1036, gd_484, channel3_period, channel3_dev, gda_852);
          }
          if (searchChannel_4) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 4:\n";
-            f0_4(channel4_p1, channel4_p2, 9, 10, 11, searchEntryChannels >= 8, gd_372, gd_380, gd_388, gd_396, gd_404, gd_1044, gd_1060, gd_1052, gd_1068, gd_1076, gd_492, gi_604, gd_608, gda_856);
+            f0_4(channel4_p1, channel4_p2, 9, 10, 11, searchEntryChannels >= 8, gd_372, gd_380, gd_388, gd_396, gd_404, gd_1044, gd_1060, gd_1052, gd_1068, gd_1076, gd_492, channel4_period, channel4_dev, gda_856);
          }
          if (searchChannel_5) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 5:\n";
-            f0_4(channel5_p1, channel5_p2, 12, 13, 14, searchEntryChannels >= 8, gd_412, gd_420, gd_428, gd_436, gd_444, gd_1084, gd_1100, gd_1092, gd_1108, gd_1116, gd_500, gi_624, gd_628, gda_860);
+            f0_4(channel5_p1, channel5_p2, 12, 13, 14, searchEntryChannels >= 8, gd_412, gd_420, gd_428, gd_436, gd_444, gd_1084, gd_1100, gd_1092, gd_1108, gd_1116, gd_500, channel5_period, channel5_dev, gda_860);
          }
       } else {
          if (searchChannel_5) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 5:\n";
-            f0_4(channel5_p1, channel5_p2, 12, 13, 14, searchEntryChannels >= 8, gd_412, gd_420, gd_428, gd_436, gd_444, gd_1084, gd_1100, gd_1092, gd_1108, gd_1116, gd_500, gi_624, gd_628, gda_860);
+            f0_4(channel5_p1, channel5_p2, 12, 13, 14, searchEntryChannels >= 8, gd_412, gd_420, gd_428, gd_436, gd_444, gd_1084, gd_1100, gd_1092, gd_1108, gd_1116, gd_500, channel5_period, channel5_dev, gda_860);
          }
          if (searchChannel_4) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 4:\n";
-            f0_4(channel4_p1, channel4_p2, 9, 10, 11, searchEntryChannels >= 8, gd_372, gd_380, gd_388, gd_396, gd_404, gd_1044, gd_1060, gd_1052, gd_1068, gd_1076, gd_492, gi_604, gd_608, gda_856);
+            f0_4(channel4_p1, channel4_p2, 9, 10, 11, searchEntryChannels >= 8, gd_372, gd_380, gd_388, gd_396, gd_404, gd_1044, gd_1060, gd_1052, gd_1068, gd_1076, gd_492, channel4_period, channel4_dev, gda_856);
          }
          if (searchChannel_2) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 2:\n";
-            f0_4(channel2_p1, channel2_p2, 3, 4, 5, searchEntryChannels >= 8, gd_292, gd_300, gd_308, gd_316, gd_324, gd_964, gd_980, gd_972, gd_988, gd_996, gd_476, gi_564, gd_568, gda_848);
+            f0_4(channel2_p1, channel2_p2, 3, 4, 5, searchEntryChannels >= 8, gd_292, gd_300, gd_308, gd_316, gd_324, gd_964, gd_980, gd_972, gd_988, gd_996, gd_476, channel2_period, channel2_dev, gda_848);
          }
          if (searchChannel_1) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 1:\n";
-            f0_4(currentPeriod, channel1_p2, 0, 1, 2, searchEntryChannels >= 8, gd_252, gd_260, gd_268, gd_276, gd_284, gd_924, gd_940, gd_932, gd_948, gd_956, gd_468, gi_544, gd_548, gda_844);
+            f0_4(currentPeriod, channel1_p2, 0, 1, 2, searchEntryChannels >= 8, gd_252, gd_260, gd_268, gd_276, gd_284, gd_924, gd_940, gd_932, gd_948, gd_956, gd_468, channel1_period, channel1_dev, gda_844);
          }
          if (searchChannel_3) {
             if (enableDebug) debugMessage = debugMessage + " CHANNEL 3:\n";
-            f0_4(channel3_p1, channel3_p2, 6, 7, 8, searchEntryChannels >= 8, gd_332, gd_340, gd_348, gd_356, gd_364, gd_1004, gd_1020, gd_1012, gd_1028, gd_1036, gd_484, gi_584, gd_588, gda_852);
+            f0_4(channel3_p1, channel3_p2, 6, 7, 8, searchEntryChannels >= 8, gd_332, gd_340, gd_348, gd_356, gd_364, gd_1004, gd_1020, gd_1012, gd_1028, gd_1036, gd_484, channel3_period, channel3_dev, gda_852);
          }
       }
       Comment("Searching for An Entry...");
@@ -740,7 +735,6 @@ int start() {
 void f0_1(int ai_0) {
    int li_4;
    int li_8;
-   string ls_12;
    if (searchChannel_1) {
       bandsShift = 1;
       hlshift = 1;
@@ -755,7 +749,7 @@ void f0_1(int ai_0) {
          channel1_p2 = 5;
       }
       for (int li_20 = 0; li_20 < ai_0 || gda_844[gi_1152 - 1] == 0.0; li_20++) {
-         li_8 = f0_2(currentPeriod, channel1_p2, gd_252, gd_260, gd_268, gd_276, gd_284, gd_924, gd_940, gd_932, gd_948, gd_956, gd_468, gi_544, gd_548, gda_844);
+         li_8 = f0_2(currentPeriod, channel1_p2, gd_252, gd_260, gd_268, gd_276, gd_284, gd_924, gd_940, gd_932, gd_948, gd_956, gd_468, channel1_period, channel1_dev, gda_844);
          if (!(li_8)) break;
       }
       if (ai_0 == -1) {
@@ -777,7 +771,7 @@ void f0_1(int ai_0) {
          channel2_p2 = 5;
       }
       for (li_20 = 0; li_20 < ai_0 || gda_848[gi_1152 - 1] == 0.0; li_20++) {
-         li_8 = f0_2(channel2_p1, channel2_p2, gd_292, gd_300, gd_308, gd_316, gd_324, gd_964, gd_980, gd_972, gd_988, gd_996, gd_476, gi_564, gd_568, gda_848);
+         li_8 = f0_2(channel2_p1, channel2_p2, gd_292, gd_300, gd_308, gd_316, gd_324, gd_964, gd_980, gd_972, gd_988, gd_996, gd_476, channel2_period, channel2_dev, gda_848);
          if (!(li_8)) break;
       }
       if (ai_0 == -1) {
@@ -800,7 +794,7 @@ void f0_1(int ai_0) {
       gi_1460 = 0;
       gi_1464 = 0;
       for (li_20 = 0; li_20 < ai_0 || gda_852[gi_1152 - 1] == 0.0; li_20++) {
-         li_8 = f0_2(channel3_p1, channel3_p2, gd_332, gd_340, gd_348, gd_356, gd_364, gd_1004, gd_1020, gd_1012, gd_1028, gd_1036, gd_484, gi_584, gd_588, gda_852);
+         li_8 = f0_2(channel3_p1, channel3_p2, gd_332, gd_340, gd_348, gd_356, gd_364, gd_1004, gd_1020, gd_1012, gd_1028, gd_1036, gd_484, channel3_period, channel3_dev, gda_852);
          if (!(li_8)) break;
       }
       if (ai_0 == -1) {
@@ -822,7 +816,7 @@ void f0_1(int ai_0) {
          channel4_p2 = 15;
       }
       for (li_20 = 0; li_20 < ai_0 || gda_856[gi_1152 - 1] == 0.0; li_20++) {
-         li_8 = f0_2(channel4_p1, channel4_p2, gd_372, gd_380, gd_388, gd_396, gd_404, gd_1044, gd_1060, gd_1052, gd_1068, gd_1076, gd_492, gi_604, gd_608, gda_856);
+         li_8 = f0_2(channel4_p1, channel4_p2, gd_372, gd_380, gd_388, gd_396, gd_404, gd_1044, gd_1060, gd_1052, gd_1068, gd_1076, gd_492, channel4_period, channel4_dev, gda_856);
          if (!(li_8)) break;
       }
       if (ai_0 == -1) {
@@ -844,7 +838,7 @@ void f0_1(int ai_0) {
          channel5_p2 = 15;
       }
       for (li_20 = 0; li_20 < ai_0 || gda_860[gi_1152 - 1] == 0.0; li_20++) {
-         li_8 = f0_2(channel5_p1, channel5_p2, gd_412, gd_420, gd_428, gd_436, gd_444, gd_1084, gd_1100, gd_1092, gd_1108, gd_1116, gd_500, gi_624, gd_628, gda_860);
+         li_8 = f0_2(channel5_p1, channel5_p2, gd_412, gd_420, gd_428, gd_436, gd_444, gd_1084, gd_1100, gd_1092, gd_1108, gd_1116, gd_500, channel5_period, channel5_dev, gda_860);
          if (!(li_8)) break;
       }
       if (ai_0 == -1) {
@@ -854,7 +848,7 @@ void f0_1(int ai_0) {
    }
 }
 
-int f0_2(int period, int hlperiod, double ad_8, double ad_16, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, int ai_96, double ad_100, double ada_108[5000]) {
+int f0_2(int period, int hlperiod, double ad_8, double ad_16, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, int ai_96, double ad_100, double &ada_108[5000]) {
    if (hlperiod % period != 0 && period % hlperiod != 0) {
       Print("ERROR hlperiod%period!=0 && period%hlperiod!=0   hlperiod:" + hlperiod + "  period:" + period);
       return (0);
@@ -881,32 +875,32 @@ int f0_2(int period, int hlperiod, double ad_8, double ad_16, double ad_24, doub
    gda_1180[7] = hl_high;
    gda_1180[8] = 0;
    gda_1180[9] = gi_1152;
-   EURUSD_IMPORT(period, hlperiod, 0, 0, ad_24, ad_8, ad_16, gd_236, gd_244, ad_32, gd_508, ad_40, ad_48, ad_56, ad_64, ad_72, gd_1124, ad_80, gd_1132, - 2, lowerBand,
+   EURUSD_IMPORT(0, ad_24, ad_8, ad_16, gd_236, gd_244, ad_32, gd_508, ad_40, ad_48, ad_56, ad_64, ad_72, gd_1124, ad_80, gd_1132, - 2, lowerBand,
       upperBand, ld_112, ld_128, ld_136, 0.00015, 0.00001, hl_high, hl_diff, ada_108, gda_1180);
    gda_1180[7] = 0;
    gda_1180[8] = hl_low;
    gda_1180[9] = gi_1152;
-   EURUSD_IMPORT(period, hlperiod, 0, 0, ad_24, ad_8, ad_16, gd_236, gd_244, ad_32, gd_508, ad_40, ad_48, ad_56, ad_64, ad_72, gd_1124, ad_80, gd_1132, - 2, lowerBand,
+   EURUSD_IMPORT(0, ad_24, ad_8, ad_16, gd_236, gd_244, ad_32, gd_508, ad_40, ad_48, ad_56, ad_64, ad_72, gd_1124, ad_80, gd_1132, - 2, lowerBand,
       upperBand, ld_112, ld_128, ld_136, 0.00015, 0.00001, hl_low, hl_diff, ada_108, gda_1180);
    if (period < hlperiod) {
-      gi_1452++;
+      bandsShift++;
       gi_1460++;
       if (gi_1460 % (hlperiod / period) == FALSE) {
-         gi_1456++;
+         hlshift++;
          gi_1464++;
       }
    } else {
       if (period > hlperiod) {
-         gi_1456++;
+         hlshift++;
          gi_1464++;
          if (gi_1464 % (period / hlperiod) == FALSE) {
-            gi_1452++;
+            bandsShift++;
             gi_1460++;
          }
       } else {
-         gi_1452++;
+         bandsShift++;
          gi_1460++;
-         gi_1456++;
+         hlshift++;
          gi_1464++;
       }
    }
@@ -983,49 +977,55 @@ void f0_3() {
       gd_1208 = gd_1192 - gd_1200;
    }
    if (gi_868 == 0) {
-      gd_1240 = iBands(Symbol(), currentPeriod, gi_544, gd_548, 0, PRICE_OPEN, MODE_UPPER, 0);
-      gd_1248 = iBands(Symbol(), currentPeriod, gi_544, gd_548, 0, PRICE_OPEN, MODE_LOWER, 0);
-      gd_1256 = iBands(Symbol(), currentPeriod, gi_564, gd_568, 0, PRICE_OPEN, MODE_UPPER, 0);
-      gd_1264 = iBands(Symbol(), currentPeriod, gi_564, gd_568, 0, PRICE_OPEN, MODE_LOWER, 0);
-      gd_1272 = iBands(Symbol(), currentPeriod, gi_584, gd_588, 0, PRICE_OPEN, MODE_UPPER, 0);
-      gd_1280 = iBands(Symbol(), currentPeriod, gi_584, gd_588, 0, PRICE_OPEN, MODE_LOWER, 0);
-      gd_1288 = iBands(Symbol(), currentPeriod, gi_604, gd_608, 0, PRICE_OPEN, MODE_UPPER, 0);
-      gd_1296 = iBands(Symbol(), currentPeriod, gi_604, gd_608, 0, PRICE_OPEN, MODE_LOWER, 0);
-      gd_1304 = iBands(Symbol(), currentPeriod, gi_624, gd_628, 0, PRICE_OPEN, MODE_UPPER, 0);
-      gd_1312 = iBands(Symbol(), currentPeriod, gi_624, gd_628, 0, PRICE_OPEN, MODE_LOWER, 0);
-      gd_1320 = iBands(Symbol(), currentPeriod, gi_640, gd_644, 0, PRICE_OPEN, MODE_UPPER, 0);
-      gd_1328 = iBands(Symbol(), currentPeriod, gi_640, gd_644, 0, PRICE_OPEN, MODE_LOWER, 0);
+      gd_1240 = iBands(Symbol(), currentPeriod, channel1_period, channel1_dev, 0, PRICE_OPEN, MODE_UPPER, 0);
+      gd_1248 = iBands(Symbol(), currentPeriod, channel1_period, channel1_dev, 0, PRICE_OPEN, MODE_LOWER, 0);
+      gd_1256 = iBands(Symbol(), currentPeriod, channel2_period, channel2_dev, 0, PRICE_OPEN, MODE_UPPER, 0);
+      gd_1264 = iBands(Symbol(), currentPeriod, channel2_period, channel2_dev, 0, PRICE_OPEN, MODE_LOWER, 0);
+      gd_1272 = iBands(Symbol(), currentPeriod, channel3_period, channel3_dev, 0, PRICE_OPEN, MODE_UPPER, 0);
+      gd_1280 = iBands(Symbol(), currentPeriod, channel3_period, channel3_dev, 0, PRICE_OPEN, MODE_LOWER, 0);
+      gd_1288 = iBands(Symbol(), currentPeriod, channel4_period, channel4_dev, 0, PRICE_OPEN, MODE_UPPER, 0);
+      gd_1296 = iBands(Symbol(), currentPeriod, channel4_period, channel4_dev, 0, PRICE_OPEN, MODE_LOWER, 0);
+      gd_1304 = iBands(Symbol(), currentPeriod, channel5_period, channel5_dev, 0, PRICE_OPEN, MODE_UPPER, 0);
+      gd_1312 = iBands(Symbol(), currentPeriod, channel5_period, channel5_dev, 0, PRICE_OPEN, MODE_LOWER, 0);
+      gd_1320 = iBands(Symbol(), currentPeriod, smartExit_period, smartExit_dev, 0, PRICE_OPEN, MODE_UPPER, 0);
+      gd_1328 = iBands(Symbol(), currentPeriod, smartExit_period, smartExit_dev, 0, PRICE_OPEN, MODE_LOWER, 0);
       gd_1336 = gd_1320 - gd_1328;
       gd_1344 = gd_1328 + gd_1336 / 2.0;
    }
    if (!gi_700) {
       for (int li_124 = OrdersTotal() - 1; li_124 >= 0 && !gi_700; li_124--) {
-         OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES);
-         f0_19();
+         if(OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES)){
+           f0_19();
+         }
       }
    }
    if (!gi_700) {
       for (li_124 = OrdersHistoryTotal() - 1; li_124 >= 0 && !gi_700; li_124--) {
-         OrderSelect(li_124, SELECT_BY_POS, MODE_HISTORY);
-         f0_19();
+         if(OrderSelect(li_124, SELECT_BY_POS, MODE_HISTORY)){
+           f0_19();
+         }
       }
    }
    if (!gi_704) {
       for (li_124 = OrdersTotal() - 1; li_124 >= 0 && gi_836 < 100; li_124--) {
-         OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES);
-         if (OrderSymbol() == Symbol() && StringFind(OrderComment(), "NewSystem") >= 0 || OrderComment() == orderComment || OrderMagicNumber() == Magic) f0_20();
+         if(OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES)){
+           if (OrderSymbol() == Symbol() && (StringFind(OrderComment(), "NewSystem") >= 0 || OrderComment() == orderComment || OrderMagicNumber() == Magic)) f0_20();
+         }
       }
       for (li_124 = OrdersHistoryTotal() - 1; li_124 >= 0 && gi_836 < 100; li_124--) {
-         OrderSelect(li_124, SELECT_BY_POS, MODE_HISTORY);
-         if (OrderSymbol() == Symbol() && StringFind(OrderComment(), "NewSystem") >= 0 || OrderComment() == orderComment || OrderMagicNumber() == Magic) f0_20();
+         if(OrderSelect(li_124, SELECT_BY_POS, MODE_HISTORY)){
+           if (OrderSymbol() == Symbol() && (StringFind(OrderComment(), "NewSystem") >= 0 || OrderComment() == orderComment || OrderMagicNumber() == Magic)) f0_20();
+         }
       }
       for (li_124 = OrdersTotal() - 1; li_124 >= 0 && gi_836 < 100; li_124--) {
-         OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES);
-         if (OrderSymbol() == Symbol()) f0_20();
+         if(OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES)){
+           if (OrderSymbol() == Symbol()) f0_20();
+         }
       }
       for (li_124 = OrdersHistoryTotal() - 1; li_124 >= 0 && gi_836 < 100; li_124--) {
-         OrderSelect(li_124, SELECT_BY_POS, MODE_HISTORY);
-         if (OrderSymbol() == Symbol()) f0_20();
+         if(OrderSelect(li_124, SELECT_BY_POS, MODE_HISTORY)){
+           if (OrderSymbol() == Symbol()) f0_20();
+         }
       }
       gi_704 = TRUE;
    }
@@ -1105,7 +1105,7 @@ void f0_3() {
          if (li_32) {
             li_200 = 1;
             ls_160 = ls_160 + "!ECN Entry Conditions failed";
-            if (SupportECN && gd_1352 > 0.00001 * minStopLevel || gi_812 >= 15) {
+            if (SupportECN && (gd_1352 > 0.00001 * minStopLevel || gi_812 >= 15)) {
                useStopOrdersEnabled = 0;
                ls_160 = ls_160 + " (Use_Stop_Orders adjusted)";
             } else {
@@ -1144,7 +1144,7 @@ void f0_3() {
          if (li_32) {
             li_200 = 1;
             ls_168 = ls_168 + "!ECN Exit Conditions failed";
-            if (SupportECN && SupportNFA || gi_836 >= 15) {
+            if (SupportECN && (SupportNFA || gi_836 >= 15)) {
                hardStopTrailingEnabled = 0;
                ls_168 = ls_168 + " (Hard_Stop_Trailing adjusted)";
             } else {
@@ -1196,7 +1196,7 @@ void f0_3() {
          ls_192 = "!ECN Condition of low spread failed : realAvgSpread > " + getDoubleString(0.0002) + "    spread strength (affecting trading frequency):" + getDoubleString(ld_76, 0) + "% (higher is better)\n";
       }
    }
-   if (gi_1512 || (ls_116 != "" && gi_868 == 0) && (!IsTesting())) {
+   if ((gi_1512 || (ls_116 != "" && gi_868 == 0)) && (!IsTesting())) {
       li_84 = 0;
       for (int li_204 = 0; li_204 <= 14; li_204++) {
          for (int li_208 = 1; li_208 <= gi_1484; li_208++) {
@@ -1211,7 +1211,7 @@ void f0_3() {
       }
       if (li_84 > 0) ArraySort(lia_88);
       for (li_124 = OrdersTotal() - 1; li_124 >= 0; li_124--) {
-         OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES);
+         if (OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES)==FALSE ) continue ;
          if (OrderSymbol() == Symbol() && OrderMagicNumber() == Magic && OrderCloseTime() == 0) {
             li_0 = OrderTicket();
             for (li_156 = 0; li_156 < li_84; li_156++) {
@@ -1366,7 +1366,7 @@ void f0_3() {
    }
 }
 
-void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, double ad_96, double ad_104, int ai_112, double ad_116, double ada_124[5000]) {
+void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, double ad_96, double ad_104, int ai_112, double ad_116, double &ada_124[5000]) {
    int li_128;
    string ls_132;
    double ld_140;
@@ -1443,7 +1443,7 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
       gda_1180[7] = 0;
       gda_1180[8] = 0;
       gda_1180[9] = gi_1152;
-      EURUSD_IMPORT(ai_0, ai_4, 0, 0, ad_40, ad_24, ad_32, gd_236, gd_244, ad_48, gd_508, ad_56, ad_64, ad_72, ad_80, ad_88, gd_1124, ad_96, gd_1132, - 2, ld_148,
+      EURUSD_IMPORT(0, ad_40, ad_24, ad_32, gd_236, gd_244, ad_48, gd_508, ad_56, ad_64, ad_72, ad_80, ad_88, gd_1124, ad_96, gd_1132, - 2, ld_148,
          ld_140, ld_256, ld_272, ld_288, gd_1400, 0.00001, Bid, ld_172, ada_124, gda_1180);
       ld_184 = gda_1180[0];
       ld_192 = gda_1180[1];
@@ -1461,7 +1461,7 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
       gda_1180[7] = 0;
       gda_1180[8] = 0;
       gda_1180[9] = gi_1152;
-      EURUSD_IMPORT(ai_0, ai_4, 0, 1, ad_40, ad_24, ad_32, gd_236, gd_244, ad_48, gd_508, ad_56, ad_64, ad_72, ad_80, ad_88, gd_1124, ad_96, gd_1132, - 2, ld_148,
+      EURUSD_IMPORT(1, ad_40, ad_24, ad_32, gd_236, gd_244, ad_48, gd_508, ad_56, ad_64, ad_72, ad_80, ad_88, gd_1124, ad_96, gd_1132, - 2, ld_148,
          ld_140, ld_296, ld_304, ld_312, gd_1400, 0.00001, Bid, ld_172, ada_124, gda_1180);
       li_212 = gda_1180[2];
       ld_216 = gda_1180[3];
@@ -1519,7 +1519,7 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
    double ld_344 = 0;
    double ld_352 = 0;
    double ld_360 = 0;
-   bool li_368 = gi_1424 < maxOrders && gi_1436 == 0 || (gi_1436 != (-li_200) && gi_1436 != (-li_212)) && normalizeDouble(gd_1400) <= normalizeDouble(0.00001 * gd_244) && normalizeDouble(gd_1408) <= normalizeDouble(0.00001 * gd_244) && gi_724 == -1;
+   bool li_368 = gi_1424 < maxOrders && (gi_1436 == 0 || (gi_1436 != (-li_200) && gi_1436 != (-li_212))) && normalizeDouble(gd_1400) <= normalizeDouble(0.00001 * gd_244) && normalizeDouble(gd_1408) <= normalizeDouble(0.00001 * gd_244) && gi_724 == -1;
    if ((!IsTesting()) || printInfo) {
       if (gi_1144) {
          ld_344 = f0_22(ld_204, ld_256, li_200, 0);
@@ -1678,14 +1678,14 @@ int f0_6(int ai_0, int ai_4) {
 }
 
 int f0_7(double ad_0, double ad_8, int ai_16) {
-   double ld_20 = gda_660[0] - gda_660[1];
-   bool li_28 = ld_20 > 0.0 && ad_8 <= ad_0 + 0.00001 * Slippage;
+   double bid_diff = bid_prices[0] - bid_prices[1];
+   bool li_28 = bid_diff > 0.0 && ad_8 <= ad_0 + 0.00001 * Slippage;
    return (li_28);
 }
 
 int f0_8(double ad_0, double ad_8, int ai_16) {
-   double ld_20 = gda_660[0] - gda_660[1];
-   bool li_28 = ld_20 < 0.0 && ad_8 >= ad_0 - 0.00001 * Slippage;
+   double bid_diff = bid_prices[0] - bid_prices[1];
+   bool li_28 = bid_diff < 0.0 && ad_8 >= ad_0 - 0.00001 * Slippage;
    return (li_28);
 }
 
@@ -1872,7 +1872,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                      f0_26(li_84);
                      f0_28(li_84);
                   } else {
-                     if (!IsTesting() && ld_160 == 0.0 || (ld_160 < ld_104 - 0.0008 && ld_104 - 0.0008 - ld_160 > 0.0002)) {
+                     if (!IsTesting() && (ld_160 == 0.0 || (ld_160 < ld_104 - 0.0008 && ld_104 - 0.0008 - ld_160 > 0.0002))) {
                         li_84 = GetTickCount();
                         li_92 = OrderModify(OrderTicket(), 0, ld_104 - 0.0008, ld_112 + 0.0008, gi_1448, Lime);
                         f0_26(li_84);
@@ -1938,7 +1938,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                      f0_26(li_84);
                      f0_28(li_84);
                   } else {
-                     if (!IsTesting() && ld_160 == 0.0 || (ld_160 > ld_104 + 0.0008 && ld_160 - ld_104 - 0.0008 > 0.0002)) {
+                     if (!IsTesting() && (ld_160 == 0.0 || (ld_160 > ld_104 + 0.0008 && ld_160 - ld_104 - 0.0008 > 0.0002))) {
                         li_84 = GetTickCount();
                         li_92 = OrderModify(OrderTicket(), 0, ld_104 + 0.0008, ld_112 - 0.0008, gi_1448, Orange);
                         f0_26(li_84);
@@ -1976,7 +1976,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                f0_26(li_84);
                f0_28(li_84);
             } else {
-               if (!IsTesting() && ld_160 == 0.0 || (ld_160 < ld_104 - 0.0008 && ld_104 - 0.0008 - ld_160 > 0.0002)) {
+               if (!IsTesting() && (ld_160 == 0.0 || (ld_160 < ld_104 - 0.0008 && ld_104 - 0.0008 - ld_160 > 0.0002))) {
                   li_84 = GetTickCount();
                   li_92 = OrderModify(OrderTicket(), ld_144, ld_104 - 0.0008, ld_112 + 0.0008, 0, Lime);
                   f0_26(li_84);
@@ -2035,7 +2035,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                f0_26(li_84);
                f0_28(li_84);
             } else {
-               if (!IsTesting() && ld_160 == 0.0 || (ld_160 > ld_104 + 0.0008 && ld_160 - ld_104 - 0.0008 > 0.0002)) {
+               if (!IsTesting() && (ld_160 == 0.0 || (ld_160 > ld_104 + 0.0008 && ld_160 - ld_104 - 0.0008 > 0.0002))) {
                   li_84 = GetTickCount();
                   li_92 = OrderModify(OrderTicket(), ld_144, ld_104 + 0.0008, ld_112 - 0.0008, 0, Orange);
                   f0_26(li_84);
@@ -2098,17 +2098,19 @@ void f0_20() {
    if (!GlobalVariableGet("ClosedManually#" + OrderTicket())) {
       switch (OrderType()) {
       case OP_BUY:
-         if (OrderStopLoss() != 0.0 && StringFind(OrderComment(), "[sl]") >= 0 || OrderClosePrice() <= OrderStopLoss()) ld_0 = OrderStopLoss() - OrderClosePrice();
+         if ((OrderStopLoss() != 0.0 && StringFind(OrderComment(), "[sl]") >= 0) || OrderClosePrice() <= OrderStopLoss()) 
+            ld_0 = OrderStopLoss() - OrderClosePrice();
          else {
-            if (!((OrderTakeProfit() != 0.0 && StringFind(OrderComment(), "[tp]") >= 0 || OrderClosePrice() >= OrderTakeProfit()))) break;
-            ld_0 = OrderTakeProfit() - OrderClosePrice();
+            if (!(((OrderTakeProfit() != 0.0 && StringFind(OrderComment(), "[tp]") >= 0) || OrderClosePrice() >= OrderTakeProfit())))
+              ld_0 = OrderTakeProfit() - OrderClosePrice();
          }
          break;
       case OP_SELL:
-         if (OrderStopLoss() != 0.0 && StringFind(OrderComment(), "[sl]") >= 0 || OrderClosePrice() >= OrderStopLoss()) ld_0 = OrderClosePrice() - OrderStopLoss();
+         if ((OrderStopLoss() != 0.0 && StringFind(OrderComment(), "[sl]") >= 0) || OrderClosePrice() >= OrderStopLoss()) 
+            ld_0 = OrderClosePrice() - OrderStopLoss();
          else {
-            if (!((OrderTakeProfit() != 0.0 && StringFind(OrderComment(), "[tp]") >= 0 || OrderClosePrice() <= OrderTakeProfit()))) break;
-            ld_0 = OrderClosePrice() - OrderTakeProfit();
+            if (!(((OrderTakeProfit() != 0.0 && StringFind(OrderComment(), "[tp]") >= 0) || OrderClosePrice() <= OrderTakeProfit())))
+              ld_0 = OrderClosePrice() - OrderTakeProfit();
          }
       }
    }
@@ -2227,7 +2229,7 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
    int li_152;
    int li_156 = -1;
    bool li_160 = TRUE;
-   double ld_164 = gda_660[0] - gda_660[1];
+   double ld_164 = bid_prices[0] - bid_prices[1];
    if (initialized) {
       if (ad_56 != 0.0) {
          if (!IsTesting() && gi_1488 == 10) {
@@ -2432,64 +2434,15 @@ int f0_24(int ai_0) {
    return (0);
 }
 
-void f0_25(double &ada_0[2], double &ada_4[2], int &aia_8[2], double ad_12) {
-   double ld_20;
-   for (int li_28 = 1; li_28 > 0; li_28--) {
-      ada_0[li_28] = ada_0[li_28 - 1];
-      ada_4[li_28] = ada_4[li_28 - 1];
-      aia_8[li_28] = aia_8[li_28 - 1];
+void f0_25(double &bids[2], double &asks[2], int &ticks[2]) {
+   for (int i = 1; i > 0; i--) {
+      bids[i] = bids[i - 1];
+      asks[i] = asks[i - 1];
+      ticks[i] = ticks[i - 1];
    }
-   ada_0[0] = Bid;
-   ada_4[0] = Ask;
-   aia_8[0] = GetTickCount();
-   gd_680 = 0;
-   gi_688 = FALSE;
-   double ld_32 = 0;
-   int li_40 = 0;
-   double ld_44 = 0;
-   int li_52 = 0;
-   int li_56 = 0;
-   for (li_28 = 1; li_28 < 2; li_28++) {
-      if (aia_8[li_28] == 0) break;
-      ld_20 = ada_0[0] - ada_0[li_28];
-      if (ld_20 < ld_32) {
-         ld_32 = ld_20;
-         li_40 = aia_8[0] - aia_8[li_28];
-      }
-      if (ld_20 > ld_44) {
-         ld_44 = ld_20;
-         li_52 = aia_8[0] - aia_8[li_28];
-         if (ld_32 < 0.0 && (-ld_32) - ld_44 > 0.00001 * ad_12) {
-         }
-      }
-      if (ld_32 < 0.0 && ld_44 > 0.0) {
-         if ((-ld_32) - ld_44 > 0.00001 * ad_12) {
-            gd_680 = ld_44;
-            gi_688 = li_52;
-            break;
-         }
-         if (ld_44 + ld_32 < 0.5) {
-            gd_680 = ld_32;
-            gi_688 = li_40;
-         }
-      } else {
-         if (ld_44 > 5.0 * (0.00001 * ad_12)) {
-            gd_680 = ld_44;
-            gi_688 = li_52;
-         } else {
-            if (ld_32 < 5.0 * (0.00001 * (-ad_12))) {
-               gd_680 = ld_32;
-               gi_688 = li_40;
-               break;
-            }
-         }
-      }
-   }
-   if (gi_688 == FALSE) {
-      gd_692 = 0;
-      return;
-   }
-   gd_692 = 1000.0 * gd_680 / gi_688;
+   bids[0] = Bid;
+   asks[0] = Ask;
+   ticks[0] = GetTickCount();
 }
 
 void f0_26(int ai_0) {
@@ -2551,7 +2504,7 @@ void reset() {
    gi_908 = 0;
 }
 
-void setGlobalVariables(string prefix, double values[100], int count, int baseValue) {
+void setGlobalVariables(string prefix, double &values[100], int count, int baseValue) {
    GlobalVariableSet(prefix, baseValue);
    for (int i = 0; i < count; i++) GlobalVariableSet(prefix + i, values[i]);
 }
@@ -2567,7 +2520,7 @@ int readGlobalVariables(string prefix, double &ada_8[100], int count) {
    return (baseValue);
 }
 
-int getNonZeroValueBackwards(double array[5000], int lastIndex) {
+int getNonZeroValueBackwards(double &array[5000], int lastIndex) {
    for (int i = lastIndex - 1; i >= 0; i--)
       if (array[i] != 0.0) return (i);
    return (-1);
