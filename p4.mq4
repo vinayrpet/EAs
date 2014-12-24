@@ -23,7 +23,7 @@ bool hardStopTrailingEnabled = TRUE;
 bool useStopOrdersEnabled = TRUE;
 int maxOrders = 2;
 // Order comment should not contain any special character or identifier like [sl], [tp] or 'partial close'"
-string orderComment = "NewSystem_EURUSD_1.1.6";
+string orderComment = "NewSystem_1.1.6";
 // "================ Configuration";
 bool enableDebug = FALSE;
 bool printInfo = FALSE;
@@ -34,7 +34,7 @@ bool searchChannel_4 = TRUE;
 bool searchChannel_5 = TRUE;
 //"---------------- Scalping Factors";
 double gd_236 = 15.0;
-double gd_244 = 40.0;
+double maxSpread = 40.0;
 double gd_252 = 230.0;
 double gd_260 = 350.0;
 double gd_268 = 0.4;
@@ -61,7 +61,7 @@ double gd_428 = 0.4;
 double gd_436 = 0.5;
 double gd_444 = 0.0;
 double gd_452 = 20.0;
-double minStopLevel = 20.0;
+double maxStopLevel = 20.0;
 double gd_468 = 40.0;
 double gd_476 = 45.0;
 double gd_484 = 45.0;
@@ -128,8 +128,8 @@ double gda_848[5000];
 double gda_852[5000];
 double gda_856[5000];
 double gda_860[5000];
-int gt_864 = 0;
-int gi_868 = 0;
+int currentBarOpenTime = 0;
+int tickCountInCurrentBar = 0;
 double gda_872[200];
 int gi_876 = 0;
 bool gi_880 = TRUE;
@@ -171,10 +171,9 @@ bool gi_1140 = TRUE;
 bool gi_1144 = TRUE;
 bool gi_1148 = TRUE;
 int gi_1152 = 80;
-string gs_1156 = "12345678901234567890123456789012345678901234567890ABCDEFGHIJKLMNOP";
 string gs_1164;
 int gia_1172[] = {0};
-bool tradingPossible = FALSE;
+bool confValidated = FALSE;
 double gda_1180[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 string gs_1184 = "";
 double gd_1192;
@@ -197,14 +196,14 @@ double gd_1320;
 double gd_1328;
 double gd_1336;
 double gd_1344;
-double gd_1352;
+double stopLevel;
 double gd_1360;
 double gd_1368;
 double gd_1376;
 double gd_1384;
 double gd_1392;
-double gd_1400;
-double gd_1408;
+double realAvgSpread;
+double recentAvgSpread;
 int gi_1416;
 int gi_1420 = 0;
 int gi_1424 = 0;
@@ -230,136 +229,76 @@ int gi_1504;
 bool gi_1508;
 bool gi_1512 = FALSE;
 
-int EURUSD_IMPORT(int ai_12, double ad_16, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, double ad_96, double ad_104, double ad_112, double ad_120, double ad_128, int ai_136, double ad_140, double ad_148, double ad_156, double ad_164, double ad_172, double ad_180, double ad_188, double ad_196, double ad_204, double &ada_212[], double &ada_216[]) {
-   int li_220;
-   int li_224;
-   int li_228;
-   int li_232;
-   int li_236;
-   int li_240;
-   int li_244;
-   int li_248;
-   int li_252;
-   int li_256;
-   int li_260;
-   double ld_268;
-   double ld_276;
-   double ld_284;
-   double ld_292;
-   double ld_300;
-   double ld_356;
-   double ld_364;
-   double ld_372;
-   double ld_380;
-   double ld_388;
-   double ld_396;
-   double ld_404;
-   double ld_412;
-   double ld_420;
-   double ld_428;
-   double ld_436;
-   double ld_444;
-   double ld_452;
-   double ld_460;
-   double ld_468;
-   double ld_476;
-   double ld_484;
-   double ld_492;
-   int li_508;
-   double ld_528;
-   int li_544;
-   int li_548;
-   double ld_552;
-   int li_560;
-   bool li_264 = TRUE;
-   if (li_264 == TRUE) {
-      if (ai_136 != -2) li_220 = ai_136;
-      else li_220 = -2;
-      if (li_220 < 2) li_224 = li_220;
-      else li_224 = 2;
-      li_228 = li_224;
-      li_260 = li_224;
-      ld_268 = ada_216[9];
-      li_232 = ld_268;
-      li_248 = li_232;
-      ld_380 = 2;
-      ld_388 = ad_180 / ad_188;
-      ld_396 = ld_388 - ad_40;
-      ld_404 = ad_48 - ad_40;
-      ld_412 = ld_396 / ld_404;
-      if (ai_12 == 0) {
-         ld_420 = ad_32 - ad_24;
-         ld_428 = ld_412 * ld_420;
-         ld_436 = ad_24 + ld_428;
-         switch (li_228 + 2) {
-         case 4:
-            ld_452 = ld_436 - ad_96 * ld_380;
-            break;
-         case 3:
-            ld_452 = ld_436 - ad_96;
-            break;
-         case 1:
-            ld_452 = ld_436 + ad_80;
-            break;
-         case 0:
-            ld_444 = ad_80 * ld_380;
-            ld_452 = ld_436 + ld_444;
-            break;
-         default:
-            ld_452 = ld_436;
-         }
-         ld_460 = ld_452 * ad_188;
-         ld_284 = ld_460;
-         li_256 = 0;
-         if (ld_460 > 0.0) {
-            ld_468 = ad_196 - ad_204 * ad_16;
-            ld_476 = ad_140 - ld_460;
-            if (ld_476 < ld_468) {
-               ld_484 = ad_148 + ld_460;
-               if (ld_484 < ad_196 + ad_204 * ad_16) li_256 = 1;
-            } else li_256 = -1;
-            if (ad_72 != 0.0) ld_292 = ad_188 * ad_72;
-            else ld_292 = ad_56 * ld_460;
-         } else ld_292 = 0;
-         ld_300 = ada_216[7] - ad_148 + ad_204 * ad_16;
-         ld_276 = ad_140 - ada_216[8] + ad_204 * ad_16;
-         if (ada_216[7] != ada_216[8] || ada_216[7] != 0.0) {
-            if (ada_216[7] != 0.0) {
-               ld_528 = 0.333333333 * ad_24 * ad_188;
-               if (ld_528 < ld_300) {
-                  for (int li_536 = 0; li_536 < 80; li_536++)
-                     if (ada_212[li_536] == 0.0) break;
-                  if (li_536 < 80) {
-                     for (int li_540 = li_536; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
-                     ada_212[0] = ld_300;
-                  } else {
-                     for (li_540 = 79; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
-                     ada_212[0] = ld_300;
-                  }
-                  ada_216[0] = ad_24;
-                  ada_216[1] = ld_284;
-                  ada_216[2] = li_256;
-                  ada_216[3] = ld_292;
-                  ada_216[4] = ad_156;
-                  ada_216[5] = ad_164;
-                  ada_216[6] = ad_172;
-                  ada_216[7] = ld_300;
-                  ada_216[8] = ld_276;
-                  return (1);
-               }
-            }
-            if (ada_216[8] != 0.0) {
-               ld_492 = 0.333333333 * ad_24 * ad_188;
-               if (ld_276 > ld_492) {
-                  for (li_536 = 0; li_536 < 80; li_536++)
-                     if (ada_212[li_536] == 0.0) break;
-                  if (li_536 < 80) {
-                     for (li_540 = li_536; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
-                     ada_212[0] = -ld_276;
-                  } else {
-                     for (li_540 = 79; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
-                     ada_212[0] = -ld_276;
-                  }
+int IMPORT(int ai_12, double ad_16, double ad_24, double ad_32,
+   double ad_40, double ad_48, double ad_56, double ad_64, double ad_72,
+   double ad_80, double ad_88, double ad_96, double ad_104, double ad_112,
+   double ad_120, double ad_128, int ai_136, double ad_140, double ad_148,
+   double ad_156, double ad_164, double ad_172, double ad_180, double ad_188,
+   double ad_196, double ad_204, double &ada_212[], double &ada_216[]) {
+
+   int li_228, li_232, li_236, li_240, li_244, li_248, li_252, li_256;
+   double ld_268, ld_276, ld_284, ld_292, ld_300, ld_356, ld_364, ld_372, ld_380, ld_388, ld_396;
+   double ld_404, ld_412, ld_420, ld_428, ld_436, ld_444, ld_452, ld_460, ld_468, ld_476, ld_484;
+   double ld_492, ld_528, ld_552;
+   int li_508, li_544, li_548, li_560;
+
+   li_228 = -2;
+   ld_268 = ada_216[9];
+   li_232 = ld_268;
+   li_248 = li_232;
+   ld_380 = 2;
+   ld_388 = ad_180 / ad_188;
+   ld_396 = ld_388 - ad_40;
+   ld_404 = ad_48 - ad_40;
+   ld_412 = ld_396 / ld_404;
+   if (ai_12 == 0) {
+      ld_420 = ad_32 - ad_24;
+      ld_428 = ld_412 * ld_420;
+      ld_436 = ad_24 + ld_428;
+      switch (li_228 + 2) {
+      case 4:
+         ld_452 = ld_436 - ad_96 * ld_380;
+         break;
+      case 3:
+         ld_452 = ld_436 - ad_96;
+         break;
+      case 1:
+         ld_452 = ld_436 + ad_80;
+         break;
+      case 0:
+         ld_444 = ad_80 * ld_380;
+         ld_452 = ld_436 + ld_444;
+         break;
+      default:
+         ld_452 = ld_436;
+      }
+      ld_460 = ld_452 * ad_188;
+      ld_284 = ld_460;
+      li_256 = 0;
+      if (ld_460 > 0.0) {
+         ld_468 = ad_196 - ad_204 * ad_16;
+         ld_476 = ad_140 - ld_460;
+         if (ld_476 < ld_468) {
+            ld_484 = ad_148 + ld_460;
+            if (ld_484 < ad_196 + ad_204 * ad_16) li_256 = 1;
+         } else li_256 = -1;
+         if (ad_72 != 0.0) ld_292 = ad_188 * ad_72;
+         else ld_292 = ad_56 * ld_460;
+      } else ld_292 = 0;
+      ld_300 = ada_216[7] - ad_148 + ad_204 * ad_16;
+      ld_276 = ad_140 - ada_216[8] + ad_204 * ad_16;
+      if (ada_216[7] != ada_216[8] || ada_216[7] != 0.0) {
+         if (ada_216[7] != 0.0) {
+            ld_528 = 0.333333333 * ad_24 * ad_188;
+            if (ld_528 < ld_300) {
+               for (int li_536 = 0; li_536 < 80; li_536++)
+                  if (ada_212[li_536] == 0.0) break;
+               if (li_536 < 80) {
+                  for (int li_540 = li_536; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
+                  ada_212[0] = ld_300;
+               } else {
+                  for (li_540 = 79; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
+                  ada_212[0] = ld_300;
                }
                ada_216[0] = ad_24;
                ada_216[1] = ld_284;
@@ -373,141 +312,139 @@ int EURUSD_IMPORT(int ai_12, double ad_16, double ad_24, double ad_32, double ad
                return (1);
             }
          }
-         ada_216[0] = ad_24;
-         ada_216[1] = ld_284;
-         ada_216[2] = li_256;
-         ada_216[3] = ld_292;
-         ada_216[4] = ad_156;
-         ada_216[5] = ad_164;
-         ada_216[6] = ad_172;
-         ada_216[7] = ld_300;
-         ada_216[8] = ld_276;
-         return (1);
-      }
-      if (li_228 != 2 || li_228 == 1 || li_228 == 2) {
-         if (li_228 == 1) li_232 = (ad_56 * ld_380 + li_228) * ada_216[9] / 3.0;
-         if (li_228 == 2) li_232 = ad_56 * ada_216[9];
-         li_236 = 0;
-         li_252 = 0;
-         li_544 = 0;
-         li_548 = 0;
-         if (li_232 >= 4) {
-            li_240 = (li_232 - 4) >> 2 + 1;
-            li_548 = li_240 * 4;
-            ld_356 = 0;
-            while (li_240 > 0) {
-               if (ada_212[li_544] != 0.0) {
-                  li_236++;
-                  ld_356 += MathAbs(ada_212[li_544]);
+         if (ada_216[8] != 0.0) {
+            ld_492 = 0.333333333 * ad_24 * ad_188;
+            if (ld_276 > ld_492) {
+               for (li_536 = 0; li_536 < 80; li_536++)
+                  if (ada_212[li_536] == 0.0) break;
+               if (li_536 < 80) {
+                  for (li_540 = li_536; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
+                  ada_212[0] = -ld_276;
+               } else {
+                  for (li_540 = 79; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
+                  ada_212[0] = -ld_276;
                }
-               if (ada_212[li_544 + 1] != 0.0) {
-                  li_236++;
-                  ld_356 += MathAbs(ada_212[li_544 + 1]);
-               }
-               if (ada_212[li_544 + 2] != 0.0) {
-                  li_236++;
-                  ld_356 += MathAbs(ada_212[li_544 + 2]);
-               }
-               if (ada_212[li_544 + 3] != 0.0) {
-                  li_236++;
-                  ld_356 += MathAbs(ada_212[li_544 + 3]);
-               }
-               li_544 += 4;
-               li_240--;
             }
-            li_252 = li_236;
+            ada_216[0] = ad_24;
+            ada_216[1] = ld_284;
+            ada_216[2] = li_256;
+            ada_216[3] = ld_292;
+            ada_216[4] = ad_156;
+            ada_216[5] = ad_164;
+            ada_216[6] = ad_172;
+            ada_216[7] = ld_300;
+            ada_216[8] = ld_276;
+            return (1);
          }
+      }
+      ada_216[0] = ad_24;
+      ada_216[1] = ld_284;
+      ada_216[2] = li_256;
+      ada_216[3] = ld_292;
+      ada_216[4] = ad_156;
+      ada_216[5] = ad_164;
+      ada_216[6] = ad_172;
+      ada_216[7] = ld_300;
+      ada_216[8] = ld_276;
+      return (1);
+   }
+   if (li_228 != 2 || li_228 == 1 || li_228 == 2) {
+      if (li_228 == 1) li_232 = (ad_56 * ld_380 + li_228) * ada_216[9] / 3.0;
+      if (li_228 == 2) li_232 = ad_56 * ada_216[9];
+      li_236 = 0;
+      li_252 = 0;
+      li_544 = 0;
+      li_548 = 0;
+      if (li_232 >= 4) {
+         li_240 = (li_232 - 4) >> 2 + 1;
+         li_548 = li_240 * 4;
+         ld_356 = 0;
+         while (li_240 > 0) {
+            if (ada_212[li_544] != 0.0) {
+               li_236++;
+               ld_356 += MathAbs(ada_212[li_544]);
+            }
+            if (ada_212[li_544 + 1] != 0.0) {
+               li_236++;
+               ld_356 += MathAbs(ada_212[li_544 + 1]);
+            }
+            if (ada_212[li_544 + 2] != 0.0) {
+               li_236++;
+               ld_356 += MathAbs(ada_212[li_544 + 2]);
+            }
+            if (ada_212[li_544 + 3] != 0.0) {
+               li_236++;
+               ld_356 += MathAbs(ada_212[li_544 + 3]);
+            }
+            li_544 += 4;
+            li_240--;
+         }
+         li_252 = li_236;
+      }
+      ld_364 = 0;
+      if (li_548 >= li_232) li_544 = 0;
+      else {
          ld_364 = 0;
-         if (li_548 >= li_232) li_544 = 0;
-         else {
-            ld_364 = 0;
-            while (li_548 < li_232) {
-               li_544 = 0;
-               if (ada_212[li_548] != 0.0) {
-                  li_236++;
-                  ld_364 += MathAbs(ada_212[li_548]);
-               }
-               li_548++;
+         while (li_548 < li_232) {
+            li_544 = 0;
+            if (ada_212[li_548] != 0.0) {
+               li_236++;
+               ld_364 += MathAbs(ada_212[li_548]);
             }
-            li_252 = li_236;
+            li_548++;
          }
-         if (li_236 != 0) {
-            li_508 = 0;
-            if (ld_268 > 0.0) ld_284 = ld_356 / ld_268;
-            ld_552 = 0;
-            ld_372 = 0;
-            if (li_232 >= 4) {
-               li_560 = 0;
-               li_244 = (li_232 - 4) >> 2 + 1;
-               for (li_508 = li_244 * 4; li_244 > 0; li_244--) {
-                  if (ada_212[li_560] != ld_364) ld_372 = ld_372 + (MathAbs(ada_212[li_560]) - ld_356 / 80.0) * (MathAbs(ada_212[li_560]) - ld_356 / 80.0) + ld_364;
-                  if (ada_212[li_560 + 1] != ld_364) ld_372 += (MathAbs(ada_212[li_560 + 1]) - ld_356 / 80.0) * (MathAbs(ada_212[li_560 + 1]) - ld_356 / 80.0);
-                  if (ada_212[li_560 + 2] != ld_364) ld_372 += (MathAbs(ada_212[li_560 + 2]) - ld_356 / 80.0) * (MathAbs(ada_212[li_560 + 2]) - ld_356 / 80.0);
-                  if (ada_212[li_560 + 3] != ld_364) ld_372 += (MathAbs(ada_212[li_560 + 3]) - ld_356 / 80.0) * (MathAbs(ada_212[li_560 + 3]) - ld_356 / 80.0);
-                  li_560 += 4;
-               }
+         li_252 = li_236;
+      }
+      if (li_236 != 0) {
+         li_508 = 0;
+         if (ld_268 > 0.0) ld_284 = ld_356 / ld_268;
+         ld_552 = 0;
+         ld_372 = 0;
+         if (li_232 >= 4) {
+            li_560 = 0;
+            li_244 = (li_232 - 4) >> 2 + 1;
+            for (li_508 = li_244 * 4; li_244 > 0; li_244--) {
+               if (ada_212[li_560] != ld_364) ld_372 = ld_372 + (MathAbs(ada_212[li_560]) - ld_356 / 80.0) * (MathAbs(ada_212[li_560]) - ld_356 / 80.0) + ld_364;
+               if (ada_212[li_560 + 1] != ld_364) ld_372 += (MathAbs(ada_212[li_560 + 1]) - ld_356 / 80.0) * (MathAbs(ada_212[li_560 + 1]) - ld_356 / 80.0);
+               if (ada_212[li_560 + 2] != ld_364) ld_372 += (MathAbs(ada_212[li_560 + 2]) - ld_356 / 80.0) * (MathAbs(ada_212[li_560 + 2]) - ld_356 / 80.0);
+               if (ada_212[li_560 + 3] != ld_364) ld_372 += (MathAbs(ada_212[li_560 + 3]) - ld_356 / 80.0) * (MathAbs(ada_212[li_560 + 3]) - ld_356 / 80.0);
+               li_560 += 4;
             }
-            ld_268 = ld_412 / 2.0 + ad_120;
-            if (li_260 == -2) ld_268 += ad_104 * ld_380;
-            else
-               if (li_260 == -1) ld_268 = ld_372 + ad_104;
-            ld_268 *= MathSqrt(ld_372 / ada_216[9]);
-            ld_492 = (ld_268 + ld_284) / ad_188;
-            if (ad_32 > ld_492) ld_452 = ld_492;
-            else ld_452 = ad_32;
-         } else ld_452 = 0;
-         ld_460 = ld_452 * ad_188;
-         ld_284 = ld_460;
-         li_256 = 0;
-         if (ld_460 > 0.0) {
-            ld_468 = ad_196 - ad_204 * ad_16;
-            ld_476 = ad_140 - ld_460;
-            if (ld_476 < ld_468) {
-               ld_484 = ad_148 + ld_460;
-               if (ld_484 < ad_196 + ad_204 * ad_16) li_256 = 1;
-            } else li_256 = -1;
-            if (ad_72 != 0.0) ld_292 = ad_188 * ad_72;
-            else ld_292 = ad_56 * ld_460;
-         } else ld_292 = 0;
-         ld_300 = ada_216[7] - ad_148 + ad_204 * ad_16;
-         ld_276 = ad_140 - ada_216[8] + ad_204 * ad_16;
-         if (ada_216[7] != ada_216[8] || ada_216[7] != 0.0) {
-            if (ada_216[7] != 0.0) {
-               ld_528 = 0.333333333 * ad_24 * ad_188;
-               if (ld_528 < ld_300) {
-                  for (li_536 = 0; li_536 < 80; li_536++)
-                     if (ada_212[li_536] == 0.0) break;
-                  if (li_536 < 80) {
-                     for (li_540 = li_536; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
-                     ada_212[0] = ld_300;
-                  } else {
-                     for (li_540 = 79; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
-                     ada_212[0] = ld_300;
-                  }
-                  ada_216[0] = ad_24;
-                  ada_216[1] = ld_284;
-                  ada_216[2] = li_256;
-                  ada_216[3] = ld_292;
-                  ada_216[4] = ad_156;
-                  ada_216[5] = ad_164;
-                  ada_216[6] = ad_172;
-                  ada_216[7] = ld_300;
-                  ada_216[8] = ld_276;
-                  return (1);
-               }
-            }
-            if (ada_216[8] != 0.0) {
-               ld_492 = 0.333333333 * ad_24 * ad_188;
-               if (ld_276 > ld_492) {
-                  for (li_536 = 0; li_536 < 80; li_536++)
-                     if (ada_212[li_536] == 0.0) break;
-                  if (li_536 < 80) {
-                     for (li_540 = li_536; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
-                     ada_212[0] = -ld_276;
-                  } else {
-                     for (li_540 = 79; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
-                     ada_212[0] = -ld_276;
-                  }
+         }
+         ld_268 = ld_412 / 2.0 + ad_120;
+         ld_268 += ad_104 * ld_380;
+         ld_268 *= MathSqrt(ld_372 / ada_216[9]);
+         ld_492 = (ld_268 + ld_284) / ad_188;
+         if (ad_32 > ld_492) ld_452 = ld_492;
+         else ld_452 = ad_32;
+      } else ld_452 = 0;
+      ld_460 = ld_452 * ad_188;
+      ld_284 = ld_460;
+      li_256 = 0;
+      if (ld_460 > 0.0) {
+         ld_468 = ad_196 - ad_204 * ad_16;
+         ld_476 = ad_140 - ld_460;
+         if (ld_476 < ld_468) {
+            ld_484 = ad_148 + ld_460;
+            if (ld_484 < ad_196 + ad_204 * ad_16) li_256 = 1;
+         } else li_256 = -1;
+         if (ad_72 != 0.0) ld_292 = ad_188 * ad_72;
+         else ld_292 = ad_56 * ld_460;
+      } else ld_292 = 0;
+      ld_300 = ada_216[7] - ad_148 + ad_204 * ad_16;
+      ld_276 = ad_140 - ada_216[8] + ad_204 * ad_16;
+      if (ada_216[7] != ada_216[8] || ada_216[7] != 0.0) {
+         if (ada_216[7] != 0.0) {
+            ld_528 = 0.333333333 * ad_24 * ad_188;
+            if (ld_528 < ld_300) {
+               for (li_536 = 0; li_536 < 80; li_536++)
+                  if (ada_212[li_536] == 0.0) break;
+               if (li_536 < 80) {
+                  for (li_540 = li_536; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
+                  ada_212[0] = ld_300;
+               } else {
+                  for (li_540 = 79; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
+                  ada_212[0] = ld_300;
                }
                ada_216[0] = ad_24;
                ada_216[1] = ld_284;
@@ -521,17 +458,41 @@ int EURUSD_IMPORT(int ai_12, double ad_16, double ad_24, double ad_32, double ad
                return (1);
             }
          }
-         ada_216[0] = ad_24;
-         ada_216[1] = ld_284;
-         ada_216[2] = li_256;
-         ada_216[3] = ld_292;
-         ada_216[4] = ad_156;
-         ada_216[5] = ad_164;
-         ada_216[6] = ad_172;
-         ada_216[7] = ld_300;
-         ada_216[8] = ld_276;
-         return (1);
+         if (ada_216[8] != 0.0) {
+            ld_492 = 0.333333333 * ad_24 * ad_188;
+            if (ld_276 > ld_492) {
+               for (li_536 = 0; li_536 < 80; li_536++)
+                  if (ada_212[li_536] == 0.0) break;
+               if (li_536 < 80) {
+                  for (li_540 = li_536; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
+                  ada_212[0] = -ld_276;
+               } else {
+                  for (li_540 = 79; li_540 >= 0; li_540--) ada_212[li_540] = ada_212[li_540 - 1];
+                  ada_212[0] = -ld_276;
+               }
+            }
+            ada_216[0] = ad_24;
+            ada_216[1] = ld_284;
+            ada_216[2] = li_256;
+            ada_216[3] = ld_292;
+            ada_216[4] = ad_156;
+            ada_216[5] = ad_164;
+            ada_216[6] = ad_172;
+            ada_216[7] = ld_300;
+            ada_216[8] = ld_276;
+            return (1);
+         }
       }
+      ada_216[0] = ad_24;
+      ada_216[1] = ld_284;
+      ada_216[2] = li_256;
+      ada_216[3] = ld_292;
+      ada_216[4] = ad_156;
+      ada_216[5] = ad_164;
+      ada_216[6] = ad_172;
+      ada_216[7] = ld_300;
+      ada_216[8] = ld_276;
+      return (1);
    }
    ada_216[0] = 0;
    ada_216[1] = 0;
@@ -541,36 +502,6 @@ int EURUSD_IMPORT(int ai_12, double ad_16, double ad_24, double ad_32, double ad
    ada_216[5] = 0;
    ada_216[6] = 0;
    return (0);
-}
-
-void f0_0(double &ada_0[]) {
-   double ld_4 = ada_0[0];
-   double ld_12 = ada_0[1];
-   if (Year() == 2009) {
-      if (Month() <= 5) {
-         ld_4 = 2.5 * ld_4;
-         ld_12 /= 2.5;
-      } else {
-         if (Month() == 6 || Month() == 7) {
-            ld_4 = 3.5 * ld_4;
-            ld_12 /= 3.5;
-         } else {
-            ld_4 = 1.5 * ld_4;
-            ld_12 /= 1.5;
-         }
-      }
-   }
-   if (Year() == 2010) {
-      if (Month() == 5) {
-         ld_4 = 4.0 * ld_4;
-         ld_12 /= 4.0;
-      } else {
-         ld_4 = 1.5 * ld_4;
-         ld_12 /= 1.5;
-      }
-   }
-   ada_0[0] = ld_4;
-   ada_0[1] = ld_12;
 }
 
 int init() {
@@ -624,31 +555,34 @@ int init() {
    //      gi_1484 = 7;
    //      gd_516 = 1;
    }
+   stopLevel = MarketInfo(Symbol(), MODE_STOPLEVEL) * Point;
+   maxStopLevel = 20 * Point;
+
    if (!IsTesting()) reInitGlobalVariables();
    checkOrdersForClose();
    if (Period() != PERIOD_M1 && Period() != PERIOD_M5) {
-      Print("ERROR --  " + "NewSystem_EURUSD_1.1.6" + " should be attached to The 1/5 Minute Chart Window");
-      Comment("ERROR --  " + "NewSystem_EURUSD_1.1.6" + " should be attached to The 1/5 Minute Chart Window");
+      Print("ERROR --  " + "NewSystem_1.1.6" + " should be attached to The 1/5 Minute Chart Window");
+      Comment("ERROR --  " + "NewSystem_1.1.6" + " should be attached to The 1/5 Minute Chart Window");
    } else {
-      if (useStopOrdersEnabled && (!SupportECN) && MarketInfo(Symbol(), MODE_STOPLEVEL) * Point > 0.00001 * minStopLevel) {
-         Print("ERROR --  " + "NewSystem_EURUSD_1.1.6" + " - Use_Stop_Orders is not valid, stop level (" + getDoubleString(MarketInfo(Symbol(), MODE_STOPLEVEL) * Point) + ") should not be greater than " +
-            getDoubleString(0.00001 * minStopLevel));
-         Comment("ERROR --  " + "NewSystem_EURUSD_1.1.6" + " - Use_Stop_Orders is not valid, stop level (" + getDoubleString(MarketInfo(Symbol(), MODE_STOPLEVEL) * Point) + ") should not be greater than " +
-            getDoubleString(0.00001 * minStopLevel));
+      if (useStopOrdersEnabled && (!SupportECN) && stopLevel > maxStopLevel) {
+         Print("ERROR --  " + "NewSystem_1.1.6" + " - Use_Stop_Orders is not valid, stop level (" + getDoubleString(stopLevel) + ") should not be greater than " +
+            getDoubleString(maxStopLevel));
+         Comment("ERROR --  " + "NewSystem_1.1.6" + " - Use_Stop_Orders is not valid, stop level (" + getDoubleString(stopLevel) + ") should not be greater than " +
+            getDoubleString(maxStopLevel));
       } else {
          if (maxOrders <= 1 && SupportNFA) {
-            Print("ERROR --  " + "NewSystem_EURUSD_1.1.6" + " - SupportNFA is not valid unless setting Max_Simultaneous_Orders >= 2");
-            Comment("ERROR --  " + "NewSystem_EURUSD_1.1.6" + " - SupportNFA is not valid unless setting Max_Simultaneous_Orders >= 2");
+            Print("ERROR --  " + "NewSystem_1.1.6" + " - SupportNFA is not valid unless setting Max_Simultaneous_Orders >= 2");
+            Comment("ERROR --  " + "NewSystem_1.1.6" + " - SupportNFA is not valid unless setting Max_Simultaneous_Orders >= 2");
          } else {
             if (hardStopTrailingEnabled && (!SupportECN) && SupportNFA) {
-               Print("ERROR --  " + "NewSystem_EURUSD_1.1.6" + " - Hard_Stop_Trailing is not valid in conjunction with SupportNFA");
-               Comment("ERROR --  " + "NewSystem_EURUSD_1.1.6" + " - Hard_Stop_Trailing is not valid in conjunction with SupportNFA");
+               Print("ERROR --  " + "NewSystem_1.1.6" + " - Hard_Stop_Trailing is not valid in conjunction with SupportNFA");
+               Comment("ERROR --  " + "NewSystem_1.1.6" + " - Hard_Stop_Trailing is not valid in conjunction with SupportNFA");
             } else {
                if (Risk < 0.001 || Risk > 1000.0) {
                   Comment("ERROR -- Invalid Risk Value.");
                   Print("ERROR -- Invalid Risk Value.");
                } else {
-                  tradingPossible = TRUE;
+                  confValidated = TRUE;
                }
             }
          }
@@ -665,7 +599,7 @@ int init() {
 }
 
 int start() {
-   if (!tradingPossible) {
+   if (!confValidated) {
      return(0);
    }
 
@@ -679,9 +613,9 @@ int start() {
       if (initialized && (!started)) {
          if (IsTesting()) Print("Starting test...");
          started = TRUE;
-         f0_1(-1);
+         prepareChannels(-1);
       }
-      f0_25(bid_prices, ask_prices, tickCounts);
+      loadPrices(bid_prices, ask_prices, tickCounts);
       debugMessage = "";
       f0_3();
       if (SupportNFA) {
@@ -732,7 +666,7 @@ int start() {
    return (0);
 }
 
-void f0_1(int ai_0) {
+void prepareChannels(int prevCount) {
    int li_4;
    int li_8;
    if (searchChannel_1) {
@@ -748,12 +682,12 @@ void f0_1(int ai_0) {
          currentPeriod = 5;
          channel1_p2 = 5;
       }
-      for (int li_20 = 0; li_20 < ai_0 || gda_844[gi_1152 - 1] == 0.0; li_20++) {
+      for (int li_20 = 0; li_20 < prevCount || gda_844[gi_1152 - 1] == 0.0; li_20++) {
          li_8 = f0_2(currentPeriod, channel1_p2, gd_252, gd_260, gd_268, gd_276, gd_284, gd_924, gd_940, gd_932, gd_948, gd_956, gd_468, channel1_period, channel1_dev, gda_844);
          if (!(li_8)) break;
       }
-      if (ai_0 == -1) {
-         li_4 = getNonZeroValueBackwards(gda_844, gi_1152);
+      if (prevCount == -1) {
+         li_4 = popLast(gda_844, gi_1152);
          swapFirstHalfElements(gda_844, li_4 + 1);
       }
    }
@@ -770,12 +704,12 @@ void f0_1(int ai_0) {
          channel2_p1 = 5;
          channel2_p2 = 5;
       }
-      for (li_20 = 0; li_20 < ai_0 || gda_848[gi_1152 - 1] == 0.0; li_20++) {
+      for (li_20 = 0; li_20 < prevCount || gda_848[gi_1152 - 1] == 0.0; li_20++) {
          li_8 = f0_2(channel2_p1, channel2_p2, gd_292, gd_300, gd_308, gd_316, gd_324, gd_964, gd_980, gd_972, gd_988, gd_996, gd_476, channel2_period, channel2_dev, gda_848);
          if (!(li_8)) break;
       }
-      if (ai_0 == -1) {
-         li_4 = getNonZeroValueBackwards(gda_848, gi_1152);
+      if (prevCount == -1) {
+         li_4 = popLast(gda_848, gi_1152);
          swapFirstHalfElements(gda_848, li_4 + 1);
       }
    }
@@ -793,12 +727,12 @@ void f0_1(int ai_0) {
       hlshift = 1;
       gi_1460 = 0;
       gi_1464 = 0;
-      for (li_20 = 0; li_20 < ai_0 || gda_852[gi_1152 - 1] == 0.0; li_20++) {
+      for (li_20 = 0; li_20 < prevCount || gda_852[gi_1152 - 1] == 0.0; li_20++) {
          li_8 = f0_2(channel3_p1, channel3_p2, gd_332, gd_340, gd_348, gd_356, gd_364, gd_1004, gd_1020, gd_1012, gd_1028, gd_1036, gd_484, channel3_period, channel3_dev, gda_852);
          if (!(li_8)) break;
       }
-      if (ai_0 == -1) {
-         li_4 = getNonZeroValueBackwards(gda_852, gi_1152);
+      if (prevCount == -1) {
+         li_4 = popLast(gda_852, gi_1152);
          swapFirstHalfElements(gda_852, li_4 + 1);
       }
    }
@@ -815,12 +749,12 @@ void f0_1(int ai_0) {
          channel4_p1 = 15;
          channel4_p2 = 15;
       }
-      for (li_20 = 0; li_20 < ai_0 || gda_856[gi_1152 - 1] == 0.0; li_20++) {
+      for (li_20 = 0; li_20 < prevCount || gda_856[gi_1152 - 1] == 0.0; li_20++) {
          li_8 = f0_2(channel4_p1, channel4_p2, gd_372, gd_380, gd_388, gd_396, gd_404, gd_1044, gd_1060, gd_1052, gd_1068, gd_1076, gd_492, channel4_period, channel4_dev, gda_856);
          if (!(li_8)) break;
       }
-      if (ai_0 == -1) {
-         li_4 = getNonZeroValueBackwards(gda_856, gi_1152);
+      if (prevCount == -1) {
+         li_4 = popLast(gda_856, gi_1152);
          swapFirstHalfElements(gda_856, li_4 + 1);
       }
    }
@@ -837,26 +771,29 @@ void f0_1(int ai_0) {
          channel5_p1 = 15;
          channel5_p2 = 15;
       }
-      for (li_20 = 0; li_20 < ai_0 || gda_860[gi_1152 - 1] == 0.0; li_20++) {
+      for (li_20 = 0; li_20 < prevCount || gda_860[gi_1152 - 1] == 0.0; li_20++) {
          li_8 = f0_2(channel5_p1, channel5_p2, gd_412, gd_420, gd_428, gd_436, gd_444, gd_1084, gd_1100, gd_1092, gd_1108, gd_1116, gd_500, channel5_period, channel5_dev, gda_860);
          if (!(li_8)) break;
       }
-      if (ai_0 == -1) {
-         li_4 = getNonZeroValueBackwards(gda_860, gi_1152);
+      if (prevCount == -1) {
+         li_4 = popLast(gda_860, gi_1152);
          swapFirstHalfElements(gda_860, li_4 + 1);
       }
    }
 }
 
-int f0_2(int period, int hlperiod, double ad_8, double ad_16, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, int ai_96, double ad_100, double &ada_108[5000]) {
+int f0_2(int period, int hlperiod, double ad_8, double ad_16, double ad_24,
+      double ad_32, double ad_40, double ad_48, double ad_56, double ad_64,
+      double ad_72, double ad_80, double ad_88, int ai_96, double ad_100, double &ada_108[5000]) {
+
    if (hlperiod % period != 0 && period % hlperiod != 0) {
       Print("ERROR hlperiod%period!=0 && period%hlperiod!=0   hlperiod:" + hlperiod + "  period:" + period);
       return (0);
    }
    double ld_112 = gd_508;
-   double ld_120 = 0.00001 * ad_88;
-   double ld_128 = 0.00001 * gd_452;
-   double ld_136 = 0.00001 * Trailing_Pips;
+   double ld_120 = Point * ad_88;
+   double ld_128 = Point * gd_452;
+   double trailingPips = Point * Trailing_Pips;
    double hl_high = iHigh(Symbol(), hlperiod, hlshift);
    double hl_low = iLow(Symbol(), hlperiod, hlshift);
    double hl_diff = hl_high - hl_low;
@@ -875,13 +812,13 @@ int f0_2(int period, int hlperiod, double ad_8, double ad_16, double ad_24, doub
    gda_1180[7] = hl_high;
    gda_1180[8] = 0;
    gda_1180[9] = gi_1152;
-   EURUSD_IMPORT(0, ad_24, ad_8, ad_16, gd_236, gd_244, ad_32, gd_508, ad_40, ad_48, ad_56, ad_64, ad_72, gd_1124, ad_80, gd_1132, - 2, lowerBand,
-      upperBand, ld_112, ld_128, ld_136, 0.00015, 0.00001, hl_high, hl_diff, ada_108, gda_1180);
+   IMPORT(0, ad_24, ad_8, ad_16, gd_236, maxSpread, ad_32, gd_508, ad_40, ad_48, ad_56, ad_64, ad_72, gd_1124, ad_80, gd_1132, -2, lowerBand,
+      upperBand, ld_112, ld_128, trailingPips, 15 * Point, Point, hl_high, hl_diff, ada_108, gda_1180);
    gda_1180[7] = 0;
    gda_1180[8] = hl_low;
    gda_1180[9] = gi_1152;
-   EURUSD_IMPORT(0, ad_24, ad_8, ad_16, gd_236, gd_244, ad_32, gd_508, ad_40, ad_48, ad_56, ad_64, ad_72, gd_1124, ad_80, gd_1132, - 2, lowerBand,
-      upperBand, ld_112, ld_128, ld_136, 0.00015, 0.00001, hl_low, hl_diff, ada_108, gda_1180);
+   IMPORT(0, ad_24, ad_8, ad_16, gd_236, maxSpread, ad_32, gd_508, ad_40, ad_48, ad_56, ad_64, ad_72, gd_1124, ad_80, gd_1132, -2, lowerBand,
+      upperBand, ld_112, ld_128, trailingPips, 15 * Point, Point, hl_low, hl_diff, ada_108, gda_1180);
    if (period < hlperiod) {
       bandsShift++;
       gi_1460++;
@@ -908,13 +845,13 @@ int f0_2(int period, int hlperiod, double ad_8, double ad_16, double ad_24, doub
 }
 
 void f0_3() {
-   int li_0;
+   int ticket;
    string ls_4;
    int li_12;
    string ls_16;
    int li_24;
    int li_28;
-   bool li_32;
+   bool isEntryExitConditionFailed;
    string ls_36;
    double ld_44;
    string ls_52;
@@ -933,13 +870,13 @@ void f0_3() {
       reInitGlobalVariables();
    }
    if (!IsTesting()) checkOrdersForClose();
-   if (gt_864 < Time[0]) {
-      gt_864 = Time[0];
-      gi_868 = 0;
-      if (gi_1500) f0_1(1);
+   if (currentBarOpenTime < Time[0]) {
+      currentBarOpenTime = Time[0];
+      tickCountInCurrentBar = 0;
+      if (gi_1500) prepareChannels(1);
       else gi_1500 = TRUE;
       if (!IsTesting()) setGlobalVars();
-   } else gi_868++;
+   } else tickCountInCurrentBar++;
    if (printInfo) f0_17();
    string ls_116 = "";
    if (AccountFreeMargin() != AccountBalance() && AccountBalance() != 0.0) {
@@ -956,7 +893,6 @@ void f0_3() {
    gi_1504 = gi_1508;
    gi_1508 = FALSE;
    gi_912 = FALSE;
-   gd_1352 = MarketInfo(Symbol(), MODE_STOPLEVEL) * Point;
    gd_1360 = Ask - Bid;
    if (MarketInfo(Symbol(), MODE_LOTSTEP) == 0.0) gi_1416 = 5;
    else gi_1416 = f0_44(0.1, MarketInfo(Symbol(), MODE_LOTSTEP));
@@ -976,7 +912,7 @@ void f0_3() {
       gd_1200 = iLow(Symbol(), PERIOD_M5, 0);
       gd_1208 = gd_1192 - gd_1200;
    }
-   if (gi_868 == 0) {
+   if (tickCountInCurrentBar == 0) {
       gd_1240 = iBands(Symbol(), currentPeriod, channel1_period, channel1_dev, 0, PRICE_OPEN, MODE_UPPER, 0);
       gd_1248 = iBands(Symbol(), currentPeriod, channel1_period, channel1_dev, 0, PRICE_OPEN, MODE_LOWER, 0);
       gd_1256 = iBands(Symbol(), currentPeriod, channel2_period, channel2_dev, 0, PRICE_OPEN, MODE_UPPER, 0);
@@ -1030,8 +966,8 @@ void f0_3() {
       gi_704 = TRUE;
    }
    if (gi_724 >= 0 || gi_724 == -2) {
-      li_24 = NormalizeDouble(Bid / 0.00001, 0);
-      li_28 = NormalizeDouble(Ask / 0.00001, 0);
+      li_24 = NormalizeDouble(Bid / Point, 0);
+      li_28 = NormalizeDouble(Ask / Point, 0);
       if (li_24 % 10 != 0 || li_28 % 10 != 0) gi_724 = -1;
       else {
          if (gi_724 >= 0 && gi_724 < 10) gi_724++;
@@ -1075,11 +1011,11 @@ void f0_3() {
       gd_764 += gda_760[li_124];
       gd_784 += gda_780[li_124];
    }
-   if (!gi_700 && gd_1368 < 0.00015) gd_716 = 0.00015 - gd_1368;
+   if (!gi_700 && gd_1368 < 15 * Point) gd_716 = 15 * Point - gd_1368;
    gd_1384 = normalizeDouble(Ask + gd_716);
    gd_1392 = normalizeDouble(Bid - gd_716);
-   gd_1400 = gd_1368 + gd_716;
-   gd_1408 = gd_1376 + gd_716;
+   realAvgSpread = gd_1368 + gd_716;
+   recentAvgSpread = gd_1376 + gd_716;
    string ls_160 = "";
    string ls_168 = "";
    string ls_176 = "";
@@ -1087,25 +1023,25 @@ void f0_3() {
    string ls_192 = "";
    int li_200 = 0;
    if (!IsTesting()) {
-      if (gi_812 > 0 || gd_1352 > 0.00001 * minStopLevel) {
-         li_32 = FALSE;
+      if (gi_812 > 0 || stopLevel > maxStopLevel) {
+         isEntryExitConditionFailed = FALSE;
          if (gi_812 > 0) {
-            if (gd_796 / gi_812 <= 10.0 && gd_1352 <= 0.00001 * minStopLevel) {
+            if (gd_796 / gi_812 <= 10.0 && stopLevel <= maxStopLevel) {
                ls_160 = ls_160 + " ECN Entry Conditions met";
                if (SupportECN) {
                   useStopOrdersEnabled = 1;
                   ls_160 = ls_160 + " (Use_Stop_Orders adjusted)";
                } else
                   if (!useStopOrdersEnabled) ls_160 = ls_160 + ", Use_Stop_Orders is recommended";
-               ls_160 = ls_160 + " :  Open Slip <= 10    stop level (" + getDoubleString(gd_1352) + ") <= " + getDoubleString(0.00001 * minStopLevel);
+               ls_160 = ls_160 + " :  Open Slip <= 10    stop level (" + getDoubleString(stopLevel) + ") <= " + getDoubleString(maxStopLevel);
                ls_160 = ls_160 
                + "\n";
-            } else li_32 = TRUE;
-         } else li_32 = TRUE;
-         if (li_32) {
+            } else isEntryExitConditionFailed = TRUE;
+         } else isEntryExitConditionFailed = TRUE;
+         if (isEntryExitConditionFailed) {
             li_200 = 1;
             ls_160 = ls_160 + "!ECN Entry Conditions failed";
-            if (SupportECN && (gd_1352 > 0.00001 * minStopLevel || gi_812 >= 15)) {
+            if (SupportECN && (stopLevel > maxStopLevel || gi_812 >= 15)) {
                useStopOrdersEnabled = 0;
                ls_160 = ls_160 + " (Use_Stop_Orders adjusted)";
             } else {
@@ -1121,13 +1057,13 @@ void f0_3() {
                   ls_160 = ls_160 + "    ";
                }
             }
-            if (gd_1352 > 0.00001 * minStopLevel) ls_160 = ls_160 + "stop level (" + getDoubleString(gd_1352) + ") > " + getDoubleString(0.00001 * minStopLevel);
+            if (stopLevel > maxStopLevel) ls_160 = ls_160 + "stop level (" + getDoubleString(stopLevel) + ") > " + getDoubleString(maxStopLevel);
             ls_160 = ls_160 
             + "\n";
          }
       }
       if (gi_836 > 0 || SupportNFA) {
-         li_32 = FALSE;
+         isEntryExitConditionFailed = FALSE;
          if (gi_836 > 0) {
             if (gd_820 / gi_836 <= 10.0 && (!SupportNFA)) {
                ls_168 = ls_168 + " ECN Exit Conditions met";
@@ -1139,9 +1075,9 @@ void f0_3() {
                ls_168 = ls_168 + " : Close Slip <= 10    SupportNFA = false";
                ls_168 = ls_168 
                + "\n";
-            } else li_32 = TRUE;
-         } else li_32 = TRUE;
-         if (li_32) {
+            } else isEntryExitConditionFailed = TRUE;
+         } else isEntryExitConditionFailed = TRUE;
+         if (isEntryExitConditionFailed) {
             li_200 = 1;
             ls_168 = ls_168 + "!ECN Exit Conditions failed";
             if (SupportECN && (SupportNFA || gi_836 >= 15)) {
@@ -1154,7 +1090,7 @@ void f0_3() {
                }
             }
             ls_168 = ls_168 + " : ";
-            li_32 = FALSE;
+            isEntryExitConditionFailed = FALSE;
             if (gi_836 > 0) {
                if (gd_820 / gi_836 > 10.0) {
                   ls_168 = ls_168 + " Close Slip > 10";
@@ -1185,26 +1121,26 @@ void f0_3() {
             ls_184 = "!ECN Condition for requotes failed" + ls_52 + " : " + getDoubleString(100.0 * ld_44, 1) + "% > 10% of possible requote errors\n";
          }
       }
-      if (gd_1400 <= 0.00001 * gd_244) {
-         ld_60 = gd_244 - gd_236;
-         ld_68 = MathMin(ld_60, MathMax(gd_244 - gd_1400 / 0.00001, 0));
+      if (realAvgSpread <= Point * maxSpread) {
+         ld_60 = maxSpread - gd_236;
+         ld_68 = MathMin(ld_60, MathMax(maxSpread - realAvgSpread / Point, 0));
          ld_76 = 90.0 * (MathPow(ld_68, 1.5) / MathPow(ld_60, 1.5)) + 10.0;
       } else ld_76 = 0;
-      if (gd_1400 <= 0.0002) ls_192 = " ECN Condition of low spread met : realAvgSpread <= " + getDoubleString(0.0002) + "    spread strength (affecting trading frequency):" + getDoubleString(ld_76, 0) + "% (higher is better)\n";
+      if (realAvgSpread <= 20 * Point) ls_192 = " ECN Condition of low spread met : realAvgSpread <= " + getDoubleString(20 * Point) + "    spread strength (affecting trading frequency):" + getDoubleString(ld_76, 0) + "% (higher is better)\n";
       else {
          li_200 = 1;
-         ls_192 = "!ECN Condition of low spread failed : realAvgSpread > " + getDoubleString(0.0002) + "    spread strength (affecting trading frequency):" + getDoubleString(ld_76, 0) + "% (higher is better)\n";
+         ls_192 = "!ECN Condition of low spread failed : realAvgSpread > " + getDoubleString(20 * Point) + "    spread strength (affecting trading frequency):" + getDoubleString(ld_76, 0) + "% (higher is better)\n";
       }
    }
-   if ((gi_1512 || (ls_116 != "" && gi_868 == 0)) && (!IsTesting())) {
+   if ((gi_1512 || (ls_116 != "" && tickCountInCurrentBar == 0)) && (!IsTesting())) {
       li_84 = 0;
       for (int li_204 = 0; li_204 <= 14; li_204++) {
          for (int li_208 = 1; li_208 <= gi_1484; li_208++) {
             if (!f0_13(li_204, li_208)) {
                ls_4 = getGlobalPrefix() + li_204 + "," + li_208;
-               li_0 = GlobalVariableGet(ls_4);
+               ticket = GlobalVariableGet(ls_4);
                ArrayResize(lia_88, li_84 + 1);
-               lia_88[li_84] = li_0;
+               lia_88[li_84] = ticket;
                li_84++;
             }
          }
@@ -1213,12 +1149,12 @@ void f0_3() {
       for (li_124 = OrdersTotal() - 1; li_124 >= 0; li_124--) {
          if (OrderSelect(li_124, SELECT_BY_POS, MODE_TRADES)==FALSE ) continue ;
          if (OrderSymbol() == Symbol() && OrderMagicNumber() == Magic && OrderCloseTime() == 0) {
-            li_0 = OrderTicket();
+            ticket = OrderTicket();
             for (li_156 = 0; li_156 < li_84; li_156++) {
                li_92 = lia_88[li_156];
-               if (li_0 < li_92) li_156 = li_84 - 1;
+               if (ticket < li_92) li_156 = li_84 - 1;
                else
-                  if (li_0 == li_92) break;
+                  if (ticket == li_92) break;
             }
             if (li_156 >= li_84) {
                if (li_84 < 15 * gi_1484) {
@@ -1226,7 +1162,7 @@ void f0_3() {
                      for (li_208 = 1; li_208 <= gi_1484; li_208++) {
                         if (f0_13(li_204, li_208)) {
                            ls_4 = getGlobalPrefix() + li_204 + "," + li_208;
-                           GlobalVariableSet(ls_4, li_0);
+                           GlobalVariableSet(ls_4, ticket);
                            GlobalVariableSet(ls_4 + "PriceProcessed", 1);
                            GlobalVariableSet(ls_4 + "USO", useStopOrdersEnabled);
                            GlobalVariableSet(ls_4 + "HST", hardStopTrailingEnabled);
@@ -1234,9 +1170,9 @@ void f0_3() {
                            GlobalVariableSet(ls_4 + "TP", 0);
                            GlobalVariableSet(ls_4 + "Price", 0);
                            ArrayResize(lia_88, li_84 + 1);
-                           lia_88[li_84] = li_0;
+                           lia_88[li_84] = ticket;
                            li_84++;
-                           Print("Order #" + li_0 + " recovered using Magic:" + Magic + " index:" + li_204 + " subindex:" + li_208);
+                           Print("Order #" + ticket + " recovered using Magic:" + Magic + " index:" + li_204 + " subindex:" + li_208);
                            li_204 = 14;
                            li_208 = gi_1484;
                         }
@@ -1244,8 +1180,8 @@ void f0_3() {
                   }
                   continue;
                }
-               Print("Closing order #" + li_0 + " using Magic:" + Magic);
-               closeOrderWithTicket(li_0);
+               Print("Closing order #" + ticket + " using Magic:" + Magic);
+               closeOrderWithTicket(ticket);
             }
          }
       }
@@ -1260,23 +1196,23 @@ void f0_3() {
          for (li_124 = 14; li_124 >= 0; li_124--) {
             for (li_208 = 1; li_208 <= gi_1484; li_208++) {
                ls_4 = getGlobalPrefix() + li_124 + "," + li_208;
-               li_0 = GlobalVariableGet(ls_4);
-               if (li_96 < li_0)
-                  if (f0_6(li_124, li_208) != 0) li_96 = li_0;
+               ticket = GlobalVariableGet(ls_4);
+               if (li_96 < ticket)
+                  if (f0_6(li_124, li_208) != 0) li_96 = ticket;
             }
          }
          if (li_96 >= 0) {
-            Print(gi_868 + ": Closing SupportNFA Orders...");
+            Print(tickCountInCurrentBar + ": Closing SupportNFA Orders...");
             li_100 = 0;
             for (li_124 = 0; li_124 <= 14; li_124++) {
                for (li_208 = 1; li_208 <= gi_1484; li_208++) {
                   ls_4 = getGlobalPrefix() + li_124 + "," + li_208;
-                  li_0 = GlobalVariableGet(ls_4);
-                  if (li_0 <= li_96) {
+                  ticket = GlobalVariableGet(ls_4);
+                  if (ticket <= li_96) {
                      ArrayResize(lia_104, li_100 + 1);
-                     lia_104[li_100] = li_0;
+                     lia_104[li_100] = ticket;
                      li_100++;
-                     GlobalVariableSet("ClosedManually#" + li_0, 1);
+                     GlobalVariableSet("ClosedManually#" + ticket, 1);
                   }
                }
             }
@@ -1292,13 +1228,13 @@ void f0_3() {
       for (li_124 = 0; li_124 <= 14; li_124++) {
          for (li_156 = 1; li_156 <= gi_1484; li_156++) {
             ls_4 = getGlobalPrefix() + li_124 + "," + li_156;
-            li_0 = GlobalVariableGet(ls_4);
-            if (OrderSelect(li_0, SELECT_BY_TICKET) && OrderCloseTime() == 0) f0_16(OrderType(), li_124);
+            ticket = GlobalVariableGet(ls_4);
+            if (OrderSelect(ticket, SELECT_BY_TICKET) && OrderCloseTime() == 0) f0_16(OrderType(), li_124);
          }
       }
    }
    if ((!IsTesting()) || printInfo) {
-      ls_108 = TimeToStr(TimeCurrent()) + " tick:" + getFormattedValue(gi_868) + "  base balance:" + getDoubleString(gd_140, 2);
+      ls_108 = TimeToStr(TimeCurrent()) + " tick:" + getFormattedValue(tickCountInCurrentBar) + "  base balance:" + getDoubleString(gd_140, 2);
       ls_108 = ls_108 
       + "\n";
       ls_108 = ls_108 + ls_116;
@@ -1306,8 +1242,8 @@ void f0_3() {
       ls_108 = ls_108 
       + "\n";
       ls_108 = ls_108 + " Bid:" + getDoubleString(Bid) + " Ask:" + getDoubleString(Ask) + " avgSpread:" + getDoubleString(gd_1368) + "  Commission rate:" + getDoubleString(gd_716);
-      ls_108 = ls_108 + "  Real avg. spread:" + getDoubleString(gd_1400);
-      ls_108 = ls_108 + "  ( recent:" + getDoubleString(gd_1408) + " )";
+      ls_108 = ls_108 + "  Real avg. spread:" + getDoubleString(realAvgSpread);
+      ls_108 = ls_108 + "  ( recent:" + getDoubleString(recentAvgSpread) + " )";
       ls_108 = ls_108 
       + "\n";
       ls_108 = ls_108 
@@ -1349,16 +1285,16 @@ void f0_3() {
          ls_108 = ls_108 + ls_184;
          ls_108 = ls_108 + ls_192;
       }
-      if (normalizeDouble(gd_1400) > normalizeDouble(0.00001 * gd_244)) {
+      if (normalizeDouble(realAvgSpread) > normalizeDouble(Point * maxSpread)) {
          ls_108 = ls_108 
          + "\n";
-         ls_108 = ls_108 + "!Robot is OFF :: Real avg. spread is too high for this scalping strategy ( " + getDoubleString(gd_1400) + " > " + getDoubleString(0.00001 * gd_244) + " )" 
+         ls_108 = ls_108 + "!Robot is OFF :: Real avg. spread is too high for this scalping strategy ( " + getDoubleString(realAvgSpread) + " > " + getDoubleString(Point * maxSpread) + " )" 
          + "\n";
       } else {
-         if (normalizeDouble(gd_1408) > normalizeDouble(0.00001 * gd_244)) {
+         if (normalizeDouble(recentAvgSpread) > normalizeDouble(Point * maxSpread)) {
             ls_108 = ls_108 
             + "\n";
-            ls_108 = ls_108 + "!Robot is OFF :: Real avg. (recent) spread is too high for this scalping strategy ( " + getDoubleString(gd_1408) + " > " + getDoubleString(0.00001 * gd_244) + " )" 
+            ls_108 = ls_108 + "!Robot is OFF :: Real avg. (recent) spread is too high for this scalping strategy ( " + getDoubleString(recentAvgSpread) + " > " + getDoubleString(Point * maxSpread) + " )" 
             + "\n";
          }
       }
@@ -1366,7 +1302,10 @@ void f0_3() {
    }
 }
 
-void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double ad_24, double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72, double ad_80, double ad_88, double ad_96, double ad_104, int ai_112, double ad_116, double &ada_124[5000]) {
+void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double ad_24,
+      double ad_32, double ad_40, double ad_48, double ad_56, double ad_64, double ad_72,
+      double ad_80, double ad_88, double ad_96, double ad_104, int ai_112, double ad_116,
+      double &ada_124[5000]) {
    int li_128;
    string ls_132;
    double ld_140;
@@ -1374,7 +1313,6 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
    double ld_156;
    double ld_164;
    double ld_172;
-   double lda_180[2];
    double ld_184;
    double ld_192;
    int li_200;
@@ -1426,25 +1364,20 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
       ld_140 = gd_1304;
       ld_148 = gd_1312;
    }
-   lda_180[0] = ad_64;
-   lda_180[1] = ad_80;
-   f0_0(lda_180);
-   ad_64 = lda_180[0];
-   ad_80 = lda_180[1];
    double ld_240 = ld_140 - ld_148;
    double ld_248 = ld_148 + ld_240 / 2.0;
    double ld_256 = gd_508;
-   double ld_264 = 0.00001 * ad_104;
-   double ld_272 = 0.00001 * gd_452;
+   double ld_264 = Point * ad_104;
+   double ld_272 = Point * gd_452;
    double ld_280 = ld_272;
-   double ld_288 = 0.00001 * Trailing_Pips;
-   ld_264 = MathMax(ld_264, gd_1352);
+   double ld_288 = Point * Trailing_Pips;
+   ld_264 = MathMax(ld_264, stopLevel);
    if (gi_1144) {
       gda_1180[7] = 0;
       gda_1180[8] = 0;
       gda_1180[9] = gi_1152;
-      EURUSD_IMPORT(0, ad_40, ad_24, ad_32, gd_236, gd_244, ad_48, gd_508, ad_56, ad_64, ad_72, ad_80, ad_88, gd_1124, ad_96, gd_1132, - 2, ld_148,
-         ld_140, ld_256, ld_272, ld_288, gd_1400, 0.00001, Bid, ld_172, ada_124, gda_1180);
+      IMPORT(0, ad_40, ad_24, ad_32, gd_236, maxSpread, ad_48, gd_508, ad_56, ad_64, ad_72, ad_80, ad_88, gd_1124, ad_96, gd_1132, -2, ld_148,
+         ld_140, ld_256, ld_272, ld_288, realAvgSpread, Point, Bid, ld_172, ada_124, gda_1180);
       ld_184 = gda_1180[0];
       ld_192 = gda_1180[1];
       li_200 = gda_1180[2];
@@ -1455,14 +1388,14 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
       gda_840[ai_8 / 3] = ld_204;
    } else gda_840[ai_8 / 3] = 0;
    double ld_296 = gd_508;
-   double ld_304 = 0.00001 * gd_452;
-   double ld_312 = 0.00001 * Trailing_Pips;
+   double ld_304 = Point * gd_452;
+   double ld_312 = Point * Trailing_Pips;
    if (gi_1148) {
       gda_1180[7] = 0;
       gda_1180[8] = 0;
       gda_1180[9] = gi_1152;
-      EURUSD_IMPORT(1, ad_40, ad_24, ad_32, gd_236, gd_244, ad_48, gd_508, ad_56, ad_64, ad_72, ad_80, ad_88, gd_1124, ad_96, gd_1132, - 2, ld_148,
-         ld_140, ld_296, ld_304, ld_312, gd_1400, 0.00001, Bid, ld_172, ada_124, gda_1180);
+      IMPORT(1, ad_40, ad_24, ad_32, gd_236, maxSpread, ad_48, gd_508, ad_56, ad_64, ad_72, ad_80, ad_88, gd_1124, ad_96, gd_1132, -2, ld_148,
+         ld_140, ld_296, ld_304, ld_312, realAvgSpread, Point, Bid, ld_172, ada_124, gda_1180);
       li_212 = gda_1180[2];
       ld_216 = gda_1180[3];
       ld_296 = gda_1180[4];
@@ -1474,8 +1407,8 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
       ld_204 = 0;
       ld_216 = 0;
    } else {
-      ld_204 = MathMax(0.0001, MathMax(gd_1352, ld_204));
-      ld_216 = MathMax(0.0001, MathMax(gd_1352, ld_216));
+      ld_204 = MathMax(10 * Point, MathMax(stopLevel, ld_204));
+      ld_216 = MathMax(10 * Point, MathMax(stopLevel, ld_216));
    }
    if (gi_880) gi_1448 = TimeCurrent() + 60.0 * MathMax(10 * ai_0, 60);
    else gi_1448 = 0;
@@ -1519,7 +1452,9 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
    double ld_344 = 0;
    double ld_352 = 0;
    double ld_360 = 0;
-   bool li_368 = gi_1424 < maxOrders && (gi_1436 == 0 || (gi_1436 != (-li_200) && gi_1436 != (-li_212))) && normalizeDouble(gd_1400) <= normalizeDouble(0.00001 * gd_244) && normalizeDouble(gd_1408) <= normalizeDouble(0.00001 * gd_244) && gi_724 == -1;
+   bool li_368 = gi_1424 < maxOrders && (gi_1436 == 0 || (gi_1436 != (-li_200) && gi_1436 != (-li_212)))
+                 && normalizeDouble(realAvgSpread) <= normalizeDouble(Point * maxSpread) 
+                 && normalizeDouble(recentAvgSpread) <= normalizeDouble(Point * maxSpread) && gi_724 == -1;
    if ((!IsTesting()) || printInfo) {
       if (gi_1144) {
          ld_344 = f0_22(ld_204, ld_256, li_200, 0);
@@ -1564,7 +1499,7 @@ void f0_4(int ai_0, int ai_4, int ai_8, int ai_12, int ai_16, bool ai_20, double
       else {
          info = "";
          if (printInfo) {
-            info = info + " " + getDoubleString(ld_192) + " (" + ld_184 + "->" + ad_32 + ")" + " " + getDoubleString(ld_204) + " digits:" + 5 + " " + gi_724 + " stopLevel:" + getDoubleString(gd_1352) + " (" + ld_256 + ")" 
+            info = info + " " + getDoubleString(ld_192) + " (" + ld_184 + "->" + ad_32 + ")" + " " + getDoubleString(ld_204) + " digits:" + 5 + " " + gi_724 + " stopLevel:" + getDoubleString(stopLevel) + " (" + ld_256 + ")" 
             + "\n";
             info = info + " " + li_200 + " " + getDoubleString(ld_148) + " " + getDoubleString(ld_140) + " " + getDoubleString(ad_40) + " exp:" + TimeToStr(gi_1448, TIME_MINUTES) + " numOrders:" + gi_1420 + " numRecentOrders:" + gi_1428 
             + "\n";
@@ -1652,7 +1587,7 @@ int f0_6(int ai_0, int ai_4) {
             else li_76 = li_68;
             if (li_76) {
                gi_884++;
-               if (IsTesting()) Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
+               if (IsTesting()) Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
             }
             if (!li_76) li_76 = f0_7(Ask, ld_16, 65280);
             if (!li_76) li_76 = f0_8(Bid, ld_8, 65280);
@@ -1664,7 +1599,7 @@ int f0_6(int ai_0, int ai_4) {
             else li_76 = li_72;
             if (li_76) {
                gi_884++;
-               if (IsTesting()) Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
+               if (IsTesting()) Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
             }
             if (!li_76) li_76 = f0_7(Ask, ld_8, 42495);
             if (!li_76) li_76 = f0_8(Bid, ld_16, 42495);
@@ -1679,13 +1614,13 @@ int f0_6(int ai_0, int ai_4) {
 
 int f0_7(double ad_0, double ad_8, int ai_16) {
    double bid_diff = bid_prices[0] - bid_prices[1];
-   bool li_28 = bid_diff > 0.0 && ad_8 <= ad_0 + 0.00001 * Slippage;
+   bool li_28 = bid_diff > 0.0 && ad_8 <= ad_0 + Point * Slippage;
    return (li_28);
 }
 
 int f0_8(double ad_0, double ad_8, int ai_16) {
    double bid_diff = bid_prices[0] - bid_prices[1];
-   bool li_28 = bid_diff < 0.0 && ad_8 >= ad_0 - 0.00001 * Slippage;
+   bool li_28 = bid_diff < 0.0 && ad_8 >= ad_0 - Point * Slippage;
    return (li_28);
 }
 
@@ -1696,7 +1631,7 @@ void f0_9(int ai_0, int ai_4) {
    }
    string ls_8 = getGlobalPrefix() + ai_0 + "," + ai_4;
    int ticket = GlobalVariableGet(ls_8);
-   Print(gi_868 + ":" + ai_0 + "," + ai_4 + "...");
+   Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + "...");
    closeOrderWithTicket(ticket);
 }
 
@@ -1704,11 +1639,11 @@ void closeOrderWithTicket(int ai_0) {
    if (OrderSelect(ai_0, SELECT_BY_TICKET) && OrderCloseTime() == 0) {
       switch (OrderType()) {
       case OP_BUY:
-         Print(gi_868 + ": Closing Soft Stop BUY #" + ai_0);
+         Print(tickCountInCurrentBar + ": Closing Soft Stop BUY #" + ai_0);
          closeOrder(Bid, Lime);
          return;
       case OP_SELL:
-         Print(gi_868 + ": Closing Soft Stop SELL #" + ai_0);
+         Print(tickCountInCurrentBar + ": Closing Soft Stop SELL #" + ai_0);
          closeOrder(Ask, Orange);
       }
    }
@@ -1747,9 +1682,9 @@ bool f0_13(int ai_0, int ai_4) {
 }
 
 void checkOrdersForClose() {
-   for (int li_0 = 0; li_0 <= 14; li_0++)
-      for (int li_4 = 1; li_4 <= gi_1484; li_4++)
-         checkOrderForClose(li_0, li_4);
+   for (int i = 0; i <= 14; i++)
+      for (int j = 1; j <= gi_1484; j++)
+         checkOrderForClose(i, j);
 }
 
 void checkOrderForClose(int ai_0, int ai_4) {
@@ -1792,10 +1727,10 @@ void f0_17() {
             if (OrderSelect(li_8, SELECT_BY_TICKET)) {
                ls_12 = getOrderTypeString(OrderType()) + "#" + li_8 + " price:" + getDoubleString(OrderOpenPrice()) + "(" + getDoubleString(GlobalVariableGet(ls_0 + "Price")) + ")" + " sl/hard:" + getDoubleString(OrderStopLoss()) + " tp/hard:" + getDoubleString(OrderTakeProfit()) + " sl:" + getDoubleString(GlobalVariableGet(ls_0 + "SL")) + " tp:" + getDoubleString(GlobalVariableGet(ls_0 + "TP")) + " opened:" + TimeToStr(OrderOpenTime());
                if (OrderCloseTime() != 0) ls_12 = ls_12 + " closed:" + TimeToStr(OrderCloseTime());
-               Print(gi_868 + ":" + li_20 + "," + li_24 + ": " + ls_12);
+               Print(tickCountInCurrentBar + ":" + li_20 + "," + li_24 + ": " + ls_12);
                continue;
             }
-            Print(gi_868 + ": " + li_20 + "," + li_24 + ": #" + li_8 + " MISSING");
+            Print(tickCountInCurrentBar + ": " + li_20 + "," + li_24 + ": #" + li_8 + " MISSING");
          }
       }
    }
@@ -1823,15 +1758,15 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
    double ld_168 = OrderTakeProfit();
    double ld_176 = GlobalVariableGet(ls_136 + "TP");
    double ld_184 = GlobalVariableGet(ls_136 + "SL");
-   if (ad_48 < gd_1352) {
-      ad_48 = gd_1352;
-      ad_56 = gd_1352 + 0.00001 * Slippage;
+   if (ad_48 < stopLevel) {
+      ad_48 = stopLevel;
+      ad_56 = stopLevel + Point * Slippage;
    }
    switch (OrderType()) {
    case OP_BUY:
       if (!li_152) {
          ArrayCopy(gda_792, gda_792, 0, 1, 99);
-         gda_792[99] = MathRound((OrderOpenPrice() - ld_144) / 0.00001);
+         gda_792[99] = MathRound((OrderOpenPrice() - ld_144) / Point);
          if (gi_812 < 100) gi_812++;
          GlobalVariableSet(ls_136 + "PriceProcessed", 1);
       }
@@ -1840,20 +1775,20 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
          GlobalVariableSet("ClosedManually#" + OrderTicket(), 1);
          gi_884++;
          if (!(IsTesting())) break;
-         Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
+         Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
       } else {
          if (GlobalVariableGet(ls_136 + "HST") && (!Smart_Exit) && li_128) {
             closeOrder(Bid, Lime);
             GlobalVariableSet("ClosedManually#" + OrderTicket(), 1);
             gi_884++;
             if (!(IsTesting())) break;
-            Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
+            Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
          } else {
             if (gi_524) {
                if (ld_184 != 0.0) {
                   ld_96 = (ld_176 - ld_184 - gd_1368 - gd_716) / 2.0;
                   ad_40 = MathMin(ad_40, ld_96);
-                  ad_40 = MathMax(ad_40, gd_1352);
+                  ad_40 = MathMax(ad_40, stopLevel);
                }
                gi_1476 = 0;
                while (true) {
@@ -1864,7 +1799,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                      ld_104 = MathMax(ld_184, ld_104);
                      ld_112 = MathMax(ld_176, ld_112);
                   }
-                  Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": Modify Order #" + OrderTicket() + " BUY tp:" + getDoubleString(ld_176) + "->" + getDoubleString(ld_112) + "  sl:" + getDoubleString(ld_184) + "->" +
+                  Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": Modify Order #" + OrderTicket() + " BUY tp:" + getDoubleString(ld_176) + "->" + getDoubleString(ld_112) + "  sl:" + getDoubleString(ld_184) + "->" +
                      getDoubleString(ld_104));
                   if (GlobalVariableGet(ls_136 + "HST") != 0.0) {
                      li_84 = GetTickCount();
@@ -1872,9 +1807,9 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                      f0_26(li_84);
                      f0_28(li_84);
                   } else {
-                     if (!IsTesting() && (ld_160 == 0.0 || (ld_160 < ld_104 - 0.0008 && ld_104 - 0.0008 - ld_160 > 0.0002))) {
+                     if (!IsTesting() && (ld_160 == 0.0 || (ld_160 < ld_104 - 80 * Point && ld_104 - 80 * Point - ld_160 > 20 * Point))) {
                         li_84 = GetTickCount();
-                        li_92 = OrderModify(OrderTicket(), 0, ld_104 - 0.0008, ld_112 + 0.0008, gi_1448, Lime);
+                        li_92 = OrderModify(OrderTicket(), 0, ld_104 - 80 * Point, ld_112 + 80 * Point, gi_1448, Lime);
                         f0_26(li_84);
                         f0_28(li_84);
                      } else li_92 = TRUE;
@@ -1897,7 +1832,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
    case OP_SELL:
       if (!li_152) {
          ArrayCopy(gda_792, gda_792, 0, 1, 99);
-         gda_792[99] = MathRound((ld_144 - OrderOpenPrice()) / 0.00001);
+         gda_792[99] = MathRound((ld_144 - OrderOpenPrice()) / Point);
          if (gi_812 < 100) gi_812++;
          GlobalVariableSet(ls_136 + "PriceProcessed", 1);
       }
@@ -1906,20 +1841,20 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
          GlobalVariableSet("ClosedManually#" + OrderTicket(), 1);
          gi_884++;
          if (!(IsTesting())) break;
-         Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
+         Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
       } else {
          if (GlobalVariableGet(ls_136 + "HST") && (!Smart_Exit) && li_132) {
             closeOrder(Ask, Orange);
             GlobalVariableSet("ClosedManually#" + OrderTicket(), 1);
             gi_884++;
             if (!(IsTesting())) break;
-            Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
+            Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": cntDirectClose:" + gi_884);
          } else {
             if (gi_524) {
                if (ld_184 != 0.0) {
                   ld_96 = (ld_184 - ld_176 - gd_1368 - gd_716) / 2.0;
                   ad_40 = MathMin(ad_40, ld_96);
-                  ad_40 = MathMax(ad_40, gd_1352);
+                  ad_40 = MathMax(ad_40, stopLevel);
                }
                gi_1476 = 0;
                while (true) {
@@ -1930,7 +1865,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                      ld_104 = MathMin(ld_184, ld_104);
                      ld_112 = MathMin(ld_176, ld_112);
                   }
-                  Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": Modify Order #" + OrderTicket() + " SELL tp:" + getDoubleString(ld_176) + "->" + getDoubleString(ld_112) + "  sl:" + getDoubleString(ld_184) + "->" +
+                  Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": Modify Order #" + OrderTicket() + " SELL tp:" + getDoubleString(ld_176) + "->" + getDoubleString(ld_112) + "  sl:" + getDoubleString(ld_184) + "->" +
                      getDoubleString(ld_104));
                   if (GlobalVariableGet(ls_136 + "HST") != 0.0) {
                      li_84 = GetTickCount();
@@ -1938,9 +1873,9 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                      f0_26(li_84);
                      f0_28(li_84);
                   } else {
-                     if (!IsTesting() && (ld_160 == 0.0 || (ld_160 > ld_104 + 0.0008 && ld_160 - ld_104 - 0.0008 > 0.0002))) {
+                     if (!IsTesting() && (ld_160 == 0.0 || (ld_160 > ld_104 + 80 * Point && ld_160 - ld_104 - 80 * Point > 20 * Point))) {
                         li_84 = GetTickCount();
-                        li_92 = OrderModify(OrderTicket(), 0, ld_104 + 0.0008, ld_112 - 0.0008, gi_1448, Orange);
+                        li_92 = OrderModify(OrderTicket(), 0, ld_104 + 80 * Point, ld_112 - 80 * Point, gi_1448, Orange);
                         f0_26(li_84);
                         f0_28(li_84);
                      } else li_92 = TRUE;
@@ -1976,9 +1911,9 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                f0_26(li_84);
                f0_28(li_84);
             } else {
-               if (!IsTesting() && (ld_160 == 0.0 || (ld_160 < ld_104 - 0.0008 && ld_104 - 0.0008 - ld_160 > 0.0002))) {
+               if (!IsTesting() && (ld_160 == 0.0 || (ld_160 < ld_104 - 80 * Point && ld_104 - 80 * Point - ld_160 > 20 * Point))) {
                   li_84 = GetTickCount();
-                  li_92 = OrderModify(OrderTicket(), ld_144, ld_104 - 0.0008, ld_112 + 0.0008, 0, Lime);
+                  li_92 = OrderModify(OrderTicket(), ld_144, ld_104 - 80 * Point, ld_112 + 80 * Point, 0, Lime);
                   f0_26(li_84);
                   f0_28(li_84);
                } else {
@@ -2012,7 +1947,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                f0_29(gi_1476);
                break;
             }
-            if (!li_88) Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": WARN Unable to delete BUYSTOP Order #" + OrderTicket());
+            if (!li_88) Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": WARN Unable to delete BUYSTOP Order #" + OrderTicket());
             li_88 = f0_24(0/* NO_ERROR */);
             if (!(li_88)) break;
          }
@@ -2035,9 +1970,9 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                f0_26(li_84);
                f0_28(li_84);
             } else {
-               if (!IsTesting() && (ld_160 == 0.0 || (ld_160 > ld_104 + 0.0008 && ld_160 - ld_104 - 0.0008 > 0.0002))) {
+               if (!IsTesting() && (ld_160 == 0.0 || (ld_160 > ld_104 + 80 * Point && ld_160 - ld_104 - 80 * Point > 20 * Point))) {
                   li_84 = GetTickCount();
-                  li_92 = OrderModify(OrderTicket(), ld_144, ld_104 + 0.0008, ld_112 - 0.0008, 0, Orange);
+                  li_92 = OrderModify(OrderTicket(), ld_144, ld_104 + 80 * Point, ld_112 - 80 * Point, 0, Orange);
                   f0_26(li_84);
                   f0_28(li_84);
                } else {
@@ -2071,7 +2006,7 @@ void f0_18(int ai_0, int ai_4, double ad_8, double ad_16, double ad_24, double a
                f0_29(gi_1476);
                break;
             }
-            if (!li_88) Print(gi_868 + ":" + ai_0 + "," + ai_4 + ": WARN Unable to delete SELLSTOP Order #" + OrderTicket());
+            if (!li_88) Print(tickCountInCurrentBar + ":" + ai_0 + "," + ai_4 + ": WARN Unable to delete SELLSTOP Order #" + OrderTicket());
             li_88 = f0_24(0/* NO_ERROR */);
             if (!(li_88)) break;
          }
@@ -2089,7 +2024,7 @@ void f0_19() {
       ld_0 = MathAbs(OrderProfit() / (OrderClosePrice() - OrderOpenPrice()));
       gd_708 = ld_0 / OrderLots() / MarketInfo(Symbol(), MODE_LOTSIZE);
       gd_716 = (-OrderCommission()) / ld_0;
-      Print(gi_868 + ": Commission_Rate : " + getDoubleString(gd_716));
+      Print(tickCountInCurrentBar + ": Commission_Rate : " + getDoubleString(gd_716));
    }
 }
 
@@ -2116,7 +2051,7 @@ void f0_20() {
    }
    if (ld_0 != -1000000.0) {
       ArrayCopy(gda_816, gda_816, 0, 1, 99);
-      gda_816[99] = MathRound(ld_0 / 0.00001);
+      gda_816[99] = MathRound(ld_0 / Point);
       if (gi_836 < 100) gi_836++;
    }
 }
@@ -2132,9 +2067,9 @@ void f0_21() {
          gd_888 = ld_0;
          gi_904 = OrderTicket();
          if ((!Sound_Alert) || printInfo) {
-            Print(gi_868 + ": realRisk:" + getDoubleString(ld_0, 2) + " ( profit:" + getDoubleString(ld_8, 2) + " of balance:" + getDoubleString(gd_140, 2) + " with lot:" + getDoubleString(OrderLots(), 2) + " )");
-            Print(gi_868 + ": maxRealRiskPercent:" + getDoubleString(gd_888, 2));
-            Print(gi_868 + ": maxRealRiskTicket:" + gi_904);
+            Print(tickCountInCurrentBar + ": realRisk:" + getDoubleString(ld_0, 2) + " ( profit:" + getDoubleString(ld_8, 2) + " of balance:" + getDoubleString(gd_140, 2) + " with lot:" + getDoubleString(OrderLots(), 2) + " )");
+            Print(tickCountInCurrentBar + ": maxRealRiskPercent:" + getDoubleString(gd_888, 2));
+            Print(tickCountInCurrentBar + ": maxRealRiskTicket:" + gi_904);
          }
       }
    }
@@ -2234,13 +2169,13 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
       if (ad_56 != 0.0) {
          if (!IsTesting() && gi_1488 == 10) {
             if (SupportECN) {
-               if (!useStopOrdersEnabled && gd_1352 <= 0.00001 * minStopLevel) useStopOrdersEnabled = 1;
+               if (!useStopOrdersEnabled && stopLevel <= maxStopLevel) useStopOrdersEnabled = 1;
                if ((!hardStopTrailingEnabled) && !SupportNFA) hardStopTrailingEnabled = 1;
             }
          }
-         if (useStopOrdersEnabled && ad_28 < gd_1352) {
-            ad_28 = gd_1352;
-            ad_36 = gd_1352 + 0.00001 * Slippage;
+         if (useStopOrdersEnabled && ad_28 < stopLevel) {
+            ad_28 = stopLevel;
+            ad_36 = stopLevel + Point * Slippage;
          }
          if (ai_52 < 0) {
             li_112 = 1;
@@ -2254,10 +2189,10 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
             } else {
                orderType = OP_BUY;
                ld_80 = normalizeDouble(ad_4 + gd_1360 + ad_28);
-               li_72 = ld_164 > 0.0 && ld_80 - 0.00001 * Slippage <= Ask && Ask <= ld_80 + 0.00001 * Slippage;
+               li_72 = ld_164 > 0.0 && ld_80 - Point * Slippage <= Ask && Ask <= ld_80 + Point * Slippage;
                ld_80 = Ask;
-               ld_88 = normalizeDouble(ld_80 - gd_1360 - MathMax(gd_1352 + 0.00001 * Slippage, ad_20 * ad_44));
-               ld_96 = normalizeDouble(ld_80 + MathMax(gd_1352 + 0.00001 * Slippage, gd_716 + ad_20));
+               ld_88 = normalizeDouble(ld_80 - gd_1360 - MathMax(stopLevel + Point * Slippage, ad_20 * ad_44));
+               ld_96 = normalizeDouble(ld_80 + MathMax(stopLevel + Point * Slippage, gd_716 + ad_20));
             }
          } else {
             if (ai_52 <= 0) return;
@@ -2272,10 +2207,10 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
             } else {
                orderType = OP_SELL;
                ld_80 = normalizeDouble(ad_12 - ad_28);
-               li_72 = ld_164 < 0.0 && ld_80 + 0.00001 * Slippage >= Bid && Bid >= ld_80 - 0.00001 * Slippage;
+               li_72 = ld_164 < 0.0 && ld_80 + Point * Slippage >= Bid && Bid >= ld_80 - Point * Slippage;
                ld_80 = Bid;
-               ld_88 = normalizeDouble(ld_80 + gd_1360 + MathMax(gd_1352 + 0.00001 * Slippage, ad_20 * ad_44));
-               ld_96 = normalizeDouble(ld_80 - MathMax(gd_1352 + 0.00001 * Slippage, gd_716 + ad_20));
+               ld_88 = normalizeDouble(ld_80 + gd_1360 + MathMax(stopLevel + Point * Slippage, ad_20 * ad_44));
+               ld_96 = normalizeDouble(ld_80 - MathMax(stopLevel + Point * Slippage, gd_716 + ad_20));
             }
          }
          li_116 = f0_12(ai_0);
@@ -2292,7 +2227,7 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
                   }
                }
             }
-            if (ld_124 != 0.0 && li_112 * (ld_124 - ld_80) < 0.00001 * gd_516) return;
+            if (ld_124 != 0.0 && li_112 * (ld_124 - ld_80) < Point * gd_516) return;
             ls_144 = getGlobalPrefix() + ai_0 + "," + li_116;
             li_76 = TRUE;
             if (useStopOrdersEnabled) {
@@ -2302,7 +2237,7 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
                } else {
                   if (!IsTesting()) {
                      gi_1512 = TRUE;
-                     li_156 = OrderSend(Symbol(), orderType, ad_56, ld_80, Slippage, ld_88 - 0.00001 * (80 * li_112), ld_96 + 0.00001 * (80 * li_112), orderComment, Magic, gi_1448, li_68);
+                     li_156 = OrderSend(Symbol(), orderType, ad_56, ld_80, Slippage, ld_88 - Point * (80 * li_112), ld_96 + Point * (80 * li_112), orderComment, Magic, gi_1448, li_68);
                   } else {
                      gi_1512 = TRUE;
                      li_156 = OrderSend(Symbol(), orderType, ad_56, ld_80, Slippage, 0, 0, orderComment, Magic, gi_1448, li_68);
@@ -2331,7 +2266,7 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
                      if (!IsTesting()) {
                         gi_1476 = 0;
                         while (true) {
-                           li_76 = OrderModify(li_156, 0, ld_88 - 0.00001 * (80 * li_112), ld_96 + 0.00001 * (80 * li_112), gi_1448, li_68);
+                           li_76 = OrderModify(li_156, 0, ld_88 - Point * (80 * li_112), ld_96 + Point * (80 * li_112), gi_1448, li_68);
                            if (li_76) {
                               f0_29(gi_1476);
                               break;
@@ -2356,7 +2291,7 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
                GlobalVariableSet(ls_144 + "HST", hardStopTrailingEnabled);
                f0_26(ld_104);
                f0_27(ld_104);
-               Print(gi_868 + ":" + ai_0 + "," + li_116 + ": " + getOrderTypeString(orderType) + "  price:" + getDoubleString(ld_80) + " SL:" + getDoubleString(ld_88) + " TP:" + getDoubleString(ld_96));
+               Print(tickCountInCurrentBar + ":" + ai_0 + "," + li_116 + ": " + getOrderTypeString(orderType) + "  price:" + getDoubleString(ld_80) + " SL:" + getDoubleString(ld_88) + " TP:" + getDoubleString(ld_96));
                if (!Sound_Alert) {
                   if (li_76) PlaySound("news.wav");
                   else PlaySound("wait.wav");
@@ -2365,12 +2300,12 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
                f0_29(gi_1480);
                gi_1480 = FALSE;
                if (!li_76) {
-                  Print(gi_868 + ":" + ai_0 + "," + li_116 + ": WARN Unable to setup s/l or t/p for order #" + li_156 + " : " + getOrderTypeString(orderType) + "  price:" + getDoubleString(ld_80) + " SL:" + getDoubleString(ld_88) +
+                  Print(tickCountInCurrentBar + ":" + ai_0 + "," + li_116 + ": WARN Unable to setup s/l or t/p for order #" + li_156 + " : " + getOrderTypeString(orderType) + "  price:" + getDoubleString(ld_80) + " SL:" + getDoubleString(ld_88) +
                      " TP:" + getDoubleString(ld_96));
                }
             } else {
                if (li_160) gi_912 = li_152;
-               Print(gi_868 + ":" + ai_0 + "," + li_116 + ": WARN Unable to create " + getOrderTypeString(orderType) + "  price:" + getDoubleString(ld_80) + " SL:" + getDoubleString(ld_88) + " TP:" + getDoubleString(ld_96));
+               Print(tickCountInCurrentBar + ":" + ai_0 + "," + li_116 + ": WARN Unable to create " + getOrderTypeString(orderType) + "  price:" + getDoubleString(ld_80) + " SL:" + getDoubleString(ld_88) + " TP:" + getDoubleString(ld_96));
             }
             gi_1512 = FALSE;
          }
@@ -2381,19 +2316,19 @@ void f0_23(int ai_0, double ad_4, double ad_12, double ad_20, double ad_28, doub
 int f0_24(int ai_0) {
    if (!ai_0) ai_0 = GetLastError();
    if (ai_0 == 0/* NO_ERROR */) {
-      if (gi_1476 != 0) Print(gi_868 + ": INFO Trading command is now succeeded after recent complaints are resolved...");
+      if (gi_1476 != 0) Print(tickCountInCurrentBar + ": INFO Trading command is now succeeded after recent complaints are resolved...");
       f0_29(gi_1476);
       gi_1476 = 0;
       return (0);
    }
    if (IsTesting()) {
-      if (ai_0 != 4059/* FUNCTION_NOT_ALLOWED_IN_TESTING_MODE */) Print(gi_868 + ": ERROR unhandled error (unable to repeat command in testing mode) : " + ErrorDescription(ai_0));
+      if (ai_0 != 4059/* FUNCTION_NOT_ALLOWED_IN_TESTING_MODE */) Print(tickCountInCurrentBar + ": ERROR unhandled error (unable to repeat command in testing mode) : " + ErrorDescription(ai_0));
       f0_29(gi_1476);
       gi_1476 = 0;
       return (0);
    }
    if (gi_1476 == 5) {
-      if (!Sound_Alert) Print(gi_868 + ": Number of subsequently repeated orders reached limit (5)");
+      if (!Sound_Alert) Print(tickCountInCurrentBar + ": Number of subsequently repeated orders reached limit (5)");
       f0_29(gi_1476);
       gi_1476 = 0;
       return (0);
@@ -2401,14 +2336,14 @@ int f0_24(int ai_0) {
    if (ai_0 == 130/* INVALID_STOPS */ || ai_0 == 129/* INVALID_PRICE */ || ai_0 == 138/* REQUOTE */ || ai_0 == 135/* PRICE_CHANGED */) {
       Sleep(50);
       RefreshRates();
-      if (!Sound_Alert) Print(gi_868 + ": WARN following error blocked our last trading command (REQUOTING + REPEATING) : " + ErrorDescription(ai_0));
+      if (!Sound_Alert) Print(tickCountInCurrentBar + ": WARN following error blocked our last trading command (REQUOTING + REPEATING) : " + ErrorDescription(ai_0));
       gi_1476++;
       return (1);
    }
    if (ai_0 == 146/* TRADE_CONTEXT_BUSY */ || ai_0 == 133/* TRADE_DISABLED */ || ai_0 == 128/* TRADE_TIMEOUT */ || ai_0 == 139/* ORDER_LOCKED */ || ai_0 == 136/* OFF_QUOTES */) {
       Sleep(500);
       RefreshRates();
-      if (!Sound_Alert) Print(gi_868 + ": WARN following error blocked our last trading command (WAITING + REQUOTING + REPEATING) : " + ErrorDescription(ai_0));
+      if (!Sound_Alert) Print(tickCountInCurrentBar + ": WARN following error blocked our last trading command (WAITING + REQUOTING + REPEATING) : " + ErrorDescription(ai_0));
       gi_1476++;
       return (1);
    }
@@ -2416,7 +2351,7 @@ int f0_24(int ai_0) {
       ai_0 == 8/* TOO_FREQUENT_REQUESTS */) {
       Sleep(1500);
       RefreshRates();
-      if (!Sound_Alert) Print(gi_868 + ": WARN following error blocked our last trading command (WAITING(2) + REQUOTING + REPEATING) : " + ErrorDescription(ai_0));
+      if (!Sound_Alert) Print(tickCountInCurrentBar + ": WARN following error blocked our last trading command (WAITING(2) + REQUOTING + REPEATING) : " + ErrorDescription(ai_0));
       gi_1476++;
       return (1);
    }
@@ -2424,17 +2359,17 @@ int f0_24(int ai_0) {
       RefreshRates();
       gi_880 = FALSE;
       gi_1448 = 0;
-      if (!Sound_Alert) Print(gi_868 + ": WARN following error blocked our last trading command (REQUOTING + REPEATING + TURNING OFF EXPIRATION) : " + ErrorDescription(ai_0));
+      if (!Sound_Alert) Print(tickCountInCurrentBar + ": WARN following error blocked our last trading command (REQUOTING + REPEATING + TURNING OFF EXPIRATION) : " + ErrorDescription(ai_0));
       gi_1476++;
       return (1);
    }
-   Print(gi_868 + ": ERROR unhandled error (unable to repeat command) : " + ErrorDescription(ai_0));
+   Print(tickCountInCurrentBar + ": ERROR unhandled error (unable to repeat command) : " + ErrorDescription(ai_0));
    f0_29(gi_1476);
    gi_1476 = 0;
    return (0);
 }
 
-void f0_25(double &bids[2], double &asks[2], int &ticks[2]) {
+void loadPrices(double &bids[2], double &asks[2], int &ticks[2]) {
    for (int i = 1; i > 0; i--) {
       bids[i] = bids[i - 1];
       asks[i] = asks[i - 1];
@@ -2520,7 +2455,7 @@ int readGlobalVariables(string prefix, double &ada_8[100], int count) {
    return (baseValue);
 }
 
-int getNonZeroValueBackwards(double &array[5000], int lastIndex) {
+int popLast(double &array[5000], int lastIndex) {
    for (int i = lastIndex - 1; i >= 0; i--)
       if (array[i] != 0.0) return (i);
    return (-1);
